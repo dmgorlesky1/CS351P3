@@ -1,1 +1,1 @@
-# CS351P3
+# CS351 Project 3
