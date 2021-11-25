@@ -41,11 +41,15 @@ public class Driver {
 
         try{
             //Call go method
+            System.out.println("Calling Heap.go()");
+            Heap heap = new Heap();
+            heap.go(args[0], args[1]);
 
         } catch(Exception e){
-            System.out.println("An Error has occurred please try again");//CHANGE ME TO PROPER MSG
-            System.out.println(e.getMessage());
-            System.out.println(e);
+//            System.out.println("An Error has occurred please try again");//CHANGE ME TO PROPER MSG
+//            System.out.println(e.getMessage());
+//            System.out.println(e);
+            e.printStackTrace(); // Changed to this, so it is easier to see where the error is
             System.exit(1);
         }
     }
