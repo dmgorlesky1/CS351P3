@@ -1,7 +1,8 @@
 import java.util.*;
-import java.io.*;
 
 public class PathNode implements Comparable {
+    /** Value the PathNode holds */
+    private int value;
 
     /** An ArrayList of vertex IDs ordered by appearance in the path. */
     private ArrayList<Integer> path;
@@ -25,7 +26,8 @@ public class PathNode implements Comparable {
     /** True if the node is the right-most node in the last level. */
     private boolean isLastNode;
 
-    public PathNode(){
+    public PathNode(int value){
+        this.value = value; // change later
         this.path = null;
         this.left = null;
         this.right = null;
@@ -44,6 +46,10 @@ public class PathNode implements Comparable {
         this.isLastNode = isLastNode;
     }
 
+
+    public int getValue() {
+        return this.value;
+    }
 
     public boolean isLastNode() {
         return isLastNode;
