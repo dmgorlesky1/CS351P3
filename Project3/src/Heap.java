@@ -5,20 +5,49 @@ import java.io.*;
  *
  */
 public class Heap {
-
-
     /** Temporary storage for the paths starting at tempPath[1]. */
-    private ArrayList<PathNode> tempPath;
+    private final ArrayList<PathNode> tempPath;
     /** Output files for before and after the heapify of a tree */
     private File before, after;
+    /** Root of the tree */
+    private PathNode root;
+    /** Picking a side to send a value down when it has the same value as the root */
+    private final Random random;
 
     /**
      * Constructor for a new Heap
      */
     public Heap(){
         this.tempPath = new ArrayList<>();
+        this.root = null;
+        this.random = new Random(); // POSSIBLY REMOVE LATER
     }
 
+    private PathNode addRecursive(PathNode current, PathNode newNode) {
+        if (current == null) {// Used if the graph is empty
+            return newNode;
+        } else if (newNode.getValue() == current.getValue()) {
+            int side = this.random.nextInt(2);
+            if (side == 0) {
+                current.setLeft(addRecursive(current.getLeft(), newNode));
+            } else {
+                current.setRight(addRecursive(current.getRight(), newNode));
+            }
+        } else if (newNode.getValue() < current.getValue()) {// If the new value is less than the
+            // current id
+            current.setLeft(addRecursive(current.getLeft(), newNode));
+        } else if (newNode.getValue() > current.getValue()) {// If the new value is larger than the
+            // current id
+            current.setRight(addRecursive(current.getRight(), newNode));
+        } else {// The id already exists
+            return current;
+        }
+        return current;
+    }
+
+    public void insert(PathNode newNode) {
+        this.root = this.addRecursive(this.root, newNode);
+    }
 
     /**
      * Reads inputFile given at the command line and places the contents of each line into the
@@ -31,6 +60,7 @@ public class Heap {
      public void readPaths(String inputFile) throws FileNotFoundException {
          File file = new File(inputFile);
          BufferedReader bufferedReader;
+         int numEdges;
 
          try {
              bufferedReader = new BufferedReader(new FileReader(file));
@@ -38,21 +68,22 @@ public class Heap {
 
              while ((s = bufferedReader.readLine()) != null) {
                  String[] stringPath = s.split(" ");
+                 numEdges = stringPath.length-1;
                  ArrayList<Integer> path = new ArrayList<>();
 
                  for (String value : stringPath) {
                      path.add(Integer.valueOf(value));
                  }
 
-                 PathNode node = new PathNode();
+                 PathNode node = new PathNode(numEdges);
                  node.setPath(path);
+                 this.insert(node);
                  this.tempPath.add(node);
              }
          } catch (IOException e) {
              e.printStackTrace();
          }
      }
-
 
     /**
      * Recursively builds a complete binary tree. Places PathNode objects in tempPath ArrayList into a
@@ -73,7 +104,6 @@ public class Heap {
     public void setLevelEnd(PathNode root){
 
     }
-
 
     /**
      * Recursive method that sets the "generation" link of PathNode objects from right-to-left.
