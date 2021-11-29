@@ -26,6 +26,16 @@ public class PathNode implements Comparable {
     /** True if the node is the right-most node in the last level. */
     private boolean isLastNode;
 
+
+    public PathNode(){
+        this.path = null;
+        this.left = null;
+        this.right = null;
+        this.parent = null;
+        this.isLevelEnd = false;
+        this.isLastNode = false;
+    }
+
     public PathNode(int value){
         this.value = value; // change later
         this.path = null;
@@ -49,6 +59,10 @@ public class PathNode implements Comparable {
 
     public int getValue() {
         return this.value;
+    }
+
+    public void setValue(int value){
+        this.value = value;
     }
 
     public boolean isLastNode() {
