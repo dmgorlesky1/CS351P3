@@ -16,9 +16,8 @@ public class PathNode implements Comparable {
     /** Reference to the parent. */
     private PathNode parent;
 
-    /** Reference to the node directly to the left on the same tree level. */
-    /** Alternatively you could do generationRight instead going to the right */
-    private PathNode generationLeft; // left sibling or cousin
+    /** Reference to the node directly to the right on the same tree level. */
+    private PathNode generationRight; // right sibling or cousin
 
     /** True if the node is last in the level. */
     private boolean isLevelEnd;
@@ -28,12 +27,14 @@ public class PathNode implements Comparable {
 
 
     public PathNode(){
+        this.value = 0;
         this.path = null;
         this.left = null;
         this.right = null;
         this.parent = null;
         this.isLevelEnd = false;
         this.isLastNode = false;
+        this.generationRight = null;
     }
 
     public PathNode(int value){
@@ -44,18 +45,35 @@ public class PathNode implements Comparable {
         this.parent = null;
         this.isLevelEnd = false;
         this.isLastNode = false;
+        this.generationRight = null;
     }
 
     public PathNode(ArrayList<Integer> path, PathNode left, PathNode right,
                     boolean isLevelEnd, boolean isLastNode, PathNode parent){
+        this.value = 0;
         this.path = path;
         this.left = left;
         this.right = right;
         this.parent = parent;
         this.isLevelEnd = isLevelEnd;
         this.isLastNode = isLastNode;
+        this.generationRight = null;
     }
 
+
+    public boolean hasLeft(){
+        if(this.left != null){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasRight(){
+        if(this.right != null){
+            return true;
+        }
+        return false;
+    }
 
     public int getValue() {
         return this.value;
@@ -89,12 +107,12 @@ public class PathNode implements Comparable {
         isLevelEnd = levelEnd;
     }
 
-    public PathNode getGenerationLeft() {
-        return generationLeft;
+    public PathNode getGenerationRight() {
+        return generationRight;
     }
 
-    public void setGenerationLeft(PathNode generationLeft) {
-        this.generationLeft = generationLeft;
+    public void setGenerationRight(PathNode generationRight) {
+        this.generationRight = generationRight;
     }
 
     public PathNode getParent() {

@@ -158,7 +158,29 @@ public class Heap {
      * @param root Root of the subtree.
      */
     public void setGenerationLinks(PathNode root){
-
+        if(root.getParent() == null){
+            if(root.hasRight()){
+                root.getLeft().setGenerationRight(root.getRight());
+                setGenerationLinks(root.getLeft());
+                setGenerationLinks(root.getRight());
+            }
+        } else if(root.hasRight()){
+            //Left --> Right
+            root.getLeft().setGenerationRight(root.getRight());
+            //Right --> Parent --> Parents generation link --> Left
+            if(root.getGenerationRight() != null){
+                if(root.getGenerationRight().hasLeft()){
+                    root.getRight().setGenerationRight(root.getGenerationRight().getLeft());
+                }
+            }
+            //Call both to set rest
+            if(root.hasLeft()){
+                setGenerationLinks(root.getLeft());
+            }
+            if(root.hasRight()){
+                setGenerationLinks(root.getRight());
+            }
+        }
     }
 
 
@@ -274,7 +296,9 @@ public class Heap {
         setLevelEnd(root);
         this.tempPath.get(this.tempPath.size()-1).setLastNode(true);
         //Set generation links
+        setGenerationLinks(root);
 
+        //Used to test generation links
 
         //This is used to test if the last node isLastNode correctly
         /**for(int i = 0; i < this.tempPath.size(); i++){
