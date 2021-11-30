@@ -310,6 +310,13 @@ public class Heap {
             System.out.println();
         }*/
 
+        //Test left and right
+        for(int i = 0; i < tempPath.size(); i++){
+            System.out.println("Node: " + tempPath.get(i).getValue() + " Left: " +
+                    tempPath.get(i).getLeft().getValue() +
+                    " Right: " + tempPath.get(i).getRight().getValue());
+        }
+
 
         //This is used to test if the last node isLastNode correctly
         /**for(int i = 0; i < this.tempPath.size(); i++){
