@@ -62,17 +62,11 @@ public class PathNode implements Comparable {
 
 
     public boolean hasLeft(){
-        if(this.left != null){
-            return true;
-        }
-        return false;
+        return this.left != null;
     }
 
     public boolean hasRight(){
-        if(this.right != null){
-            return true;
-        }
-        return false;
+        return this.right != null;
     }
 
     public int getValue() {
