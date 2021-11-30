@@ -245,7 +245,7 @@ public class Heap {
                 fileBefore.write("\t" + i + "[label=\"");
                 // Outputs the number of edges between nodes
                 pathing = tempPath.get(i).getPath().size() - 1 + "";
-                fileBefore.write(pathing + " (");
+                fileBefore.write(pathing + "(");
                 // Outputs the first path value
                 fileBefore.write(String.valueOf(this.tempPath.get(i).getPath().get(0)));
                 // Outputs every path value after
@@ -253,7 +253,7 @@ public class Heap {
                     fileBefore.write( ", " + this.tempPath.get(i).getPath().get(j));
                 }
                 // Outputs the ending styling
-                fileBefore.write(") \"];\n");
+                fileBefore.write(")\"];\n");
             }
             // Outputs the second half of the file
             for (int index = 0; index < this.tempPath.size(); index++) {
