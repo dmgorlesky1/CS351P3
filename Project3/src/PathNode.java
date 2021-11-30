@@ -27,7 +27,7 @@ public class PathNode implements Comparable {
 
 
     public PathNode(){
-        this.value = 0;
+        this.value = 2147483647;
         this.path = null;
         this.left = null;
         this.right = null;
@@ -50,7 +50,7 @@ public class PathNode implements Comparable {
 
     public PathNode(ArrayList<Integer> path, PathNode left, PathNode right,
                     boolean isLevelEnd, boolean isLastNode, PathNode parent){
-        this.value = 0;
+        this.value = 2147483647;
         this.path = path;
         this.left = left;
         this.right = right;
