@@ -28,32 +28,6 @@ public class Heap {
         this.root = null;
         this.label = "";
     }
-/*
-    private PathNode addRecursive(PathNode current, PathNode newNode) {
-        if (current == null) {// Used if the graph is empty
-            return newNode;
-        } else if (newNode.getValue() == current.getValue()) {
-            int side = this.random.nextInt(2);
-            if (side == 0) {
-                current.setLeft(addRecursive(current.getLeft(), newNode));
-            } else {
-                current.setRight(addRecursive(current.getRight(), newNode));
-            }
-        // If the new value is less than the current id
-        } else if (newNode.getValue() < current.getValue()) {
-            current.setLeft(addRecursive(current.getLeft(), newNode));
-        // If the new value is larger than the current id
-        } else if (newNode.getValue() > current.getValue()) {
-            current.setRight(addRecursive(current.getRight(), newNode));
-        } else {// The id already exists
-            return current;
-        }
-        return current;
-    }
-
-    public void insert(PathNode newNode) {
-        this.root = this.addRecursive(this.root, newNode);
-    }*/
 
     /**
      * Reads inputFile given at the command line and places the contents of each line into the
