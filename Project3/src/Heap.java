@@ -175,8 +175,8 @@ public class Heap {
      */
     public void createOutputFiles(String filename) {
         try {
-            this.before = new File(filename + "Before.dot");
-            this.after = new File(filename + "After.dot");
+            this.before = new File(filename + "Before.txt");
+            this.after = new File(filename + "After.txt");
 
             if (!this.before.createNewFile()) {
                 System.out.println("WARNING: " + this.before.getName() +
@@ -257,6 +257,77 @@ public class Heap {
         }
     }
 
+    public void outputBefore2(int time) {
+        try {
+            FileWriter fileBefore;
+            if(time == 0){
+                fileBefore = new FileWriter(this.before.getName());
+                fileBefore.write("digraph " + label + "Before{\n");
+            } else {
+                fileBefore = new FileWriter(this.after.getName());
+                fileBefore.write("digraph " + label + "After{\n");
+            }
+            // First half styling example  ->  (index)[label="(num edges)(path)"];
+            // Outputs the first half of the file
+            PathNode node = this.root;
+            PathNode node2 = null;
+            fileBefore.write(getFormat(node, 0));
+            int i = 1;
+            while(node.getLeft().getValue() != 9999){
+                System.out.println("Node : " + node.getValue());
+                while(node2 != null){
+                    System.out.println("Node 2: " + node2.getValue());
+                    if(node2.getGenerationRight() != null){
+                        System.out.println(getFormat(node2, i));
+                        fileBefore.write(getFormat(node2, i));
+                        node2 = node2.getGenerationRight();
+
+                    } else {
+                        System.out.println(getFormat(node2, i));
+                        fileBefore.write(getFormat(node2, i));
+                        node2 = null;
+                    }
+                    i++;
+                }
+                node = node.getLeft();
+                node2 = node.getGenerationRight();
+                fileBefore.write(getFormat(node, i));
+                System.out.println(getFormat(node, i));
+                i++;
+            }
+
+
+            // Outputs the second half of the file
+
+
+
+
+            fileBefore.write("}");
+            fileBefore.close();
+        } catch(IOException e) {
+            System.out.println("An error occurred in outputBefore file.");
+            System.out.println("Usage: java Driver file.txt <label>");
+            e.printStackTrace();
+            scan.close();
+            System.exit(1);
+        }
+    }
+
+
+    public String getFormat(PathNode node, int i){
+        String msg = "";
+        msg += "\t" + i + "[label=\"";
+        msg += node.getPath().size() - 1 + "(";
+        msg += node.getPath().get(0);
+        for (int j = 1; j < node.getPath().size(); j++) {
+            msg +=  ", " + node.getPath().get(j);
+        }
+        // Outputs the ending styling
+        msg += ")\"];\n";
+        return msg;
+    }
+
+
     /**
      * Runs the heap program
      * @param inputFilename Name of file with data points in it
@@ -285,11 +356,11 @@ public class Heap {
         }*/
 
         //Test left and right
-        for(int i = 0; i < tempPath.size(); i++){
+        /**for(int i = 0; i < tempPath.size(); i++){
             System.out.println("Node: " + tempPath.get(i).getValue() + " Left: " +
                     tempPath.get(i).getLeft().getValue() +
                     " Right: " + tempPath.get(i).getRight().getValue());
-        }
+        }*/
 
 
         //This is used to test if the last node isLastNode correctly
@@ -320,6 +391,6 @@ public class Heap {
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc)
 
 
-        outputBefore(1);
+        outputBefore2(1);
     }
 }

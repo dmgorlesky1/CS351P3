@@ -27,7 +27,7 @@ public class PathNode implements Comparable {
 
 
     public PathNode(){
-        this.value = 2147483647;
+        this.value = 9999;
         this.path = null;
         this.left = null;
         this.right = null;
@@ -50,7 +50,7 @@ public class PathNode implements Comparable {
 
     public PathNode(ArrayList<Integer> path, PathNode left, PathNode right,
                     boolean isLevelEnd, boolean isLastNode, PathNode parent){
-        this.value = 2147483647;
+        this.value = 9999;
         this.path = path;
         this.left = left;
         this.right = right;
@@ -95,6 +95,10 @@ public class PathNode implements Comparable {
 
     public boolean isLevelEnd() {
         return isLevelEnd;
+    }
+
+    public boolean hasGenerationRight(){
+        return this.value != 9999;
     }
 
     public void setLevelEnd(boolean levelEnd) {
