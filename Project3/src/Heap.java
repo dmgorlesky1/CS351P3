@@ -130,8 +130,8 @@ public class Heap {
      */
     public void createOutputFiles(String filename) {
         try {
-            this.before = new File(filename + "Before.txt");
-            this.after = new File(filename + "After.txt");
+            this.before = new File(filename + "Before.dot");
+            this.after = new File(filename + "After.dot");
             if (!this.before.createNewFile()) {
                 System.out.println(this.before.getName() + " already exists overwriting");
             }
