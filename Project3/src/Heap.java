@@ -40,29 +40,29 @@ public class Heap {
          try{//Making a new scanner
              File file = new File(inputFile);
              scan = new Scanner(file);
-         } catch(FileNotFoundException fnfe){
+         } catch(FileNotFoundException fileNotFound){
              System.out.println("File not found. Please check input and try again.");
              System.out.println("Usage: java Driver file.txt <label>");
              scan.close();
              System.exit(1);
          }
-         boolean check;
+         boolean nodeAdded;
          String lining;
          String[] line;
          PathNode node;
          while(scan.hasNextLine()){//Skips empty lines and tabs
-             check = false;
+             nodeAdded = false;
              lining = "";
              line = scan.nextLine().split("\\s+");//splits line to get length
-             for(int i = 0; i < line.length; i++) {
-                 if(!line[i].equals("")) {
-                     lining += line[i] + " ";
-                     check = true;
+             for (String s : line) {
+                 if (!s.equals("")) {
+                     lining += s + " ";
+                     nodeAdded = true;
                  } else {
-                     check = false;
+                     nodeAdded = false;
                  }
              }
-             if(check) {
+             if(nodeAdded) {
                  //New node added
                  node = new PathNode(lining.split(" ").length - 1);
                  node.setPath(settingPath(lining.split(" ")));
@@ -80,8 +80,8 @@ public class Heap {
 
     public ArrayList<Integer> settingPath(String[] pathFound){
         ArrayList<Integer> newList = new ArrayList<Integer>();
-        for(int i = 0; i < pathFound.length; i++){
-            newList.add(Integer.parseInt(pathFound[i]));
+        for (String s : pathFound) {
+            newList.add(Integer.parseInt(s));
         }
         return newList;
     }
@@ -127,7 +127,7 @@ public class Heap {
 
     /**
      * Recursive method that sets the "generation" link of PathNode objects from right-to-left.
-     * generation is a term I use to indicate nodes on the same level (these may be siblings or
+     * generation is a term I used to indicate nodes on the same level (these may be siblings or
      * cousins)
      * @param root Root of the subtree.
      */
@@ -197,18 +197,19 @@ public class Heap {
 
     /**
      * Outputs graph to the before and after file depending on parameter.
-     * If time == 0, write to before
-     * Else time == 1, write to after
-     * @param time Which file needs to be written to.
+     * If outputChoice == 0, write to before
+     * If outputChoice == 1, write to after
+     * @param outputChoice Which file needs to be written to.
      */
-    public void outputBefore(int time) {
+    public void outputBefore(int outputChoice) {
+        int before = 0, after = 1;
         try {
             String pathing = "";
-            FileWriter fileBefore;
-            if(time == 0){
+            FileWriter fileBefore = null;
+            if(outputChoice == before){
                 fileBefore = new FileWriter(this.before.getName());
                 fileBefore.write("digraph " + label + "Before{\n");
-            } else {
+            } else if (outputChoice == after) {
                 fileBefore = new FileWriter(this.after.getName());
                 fileBefore.write("digraph " + label + "After{\n");
             }
@@ -237,12 +238,12 @@ public class Heap {
                     fileBefore.write("\t" + index + " -> " + (index+2) + ";\n");
                 } else { // Outputs the connections for every other value
                     // Check if there is a left child
-                    if (!((2*index) > this.tempPath.size()-1)) {
-                        fileBefore.write("\t" + index + " -> " + (2*index) + ";\n");
+                    if (!((2*index) >= this.tempPath.size()-1)) {
+                        fileBefore.write("\t" + index + " -> " + (((index + 1) * 2) - 1) + ";\n");
                     }
                     // Check if there is a right child
-                    if (!((2*index+1) > this.tempPath.size()-1)) {
-                        fileBefore.write("\t" + index + " -> " + (2*index+1) + ";\n");
+                    if (!((2*index+1) >= this.tempPath.size()-1)) {
+                        fileBefore.write("\t" + index + " -> " + (((index +1) * 2 + 1) - 1) + ";\n");
                     }
                 }
             }
@@ -276,39 +277,45 @@ public class Heap {
         setGenerationLinks(root);
 
         //Used to test generation links
-        /**for(int i = 0; i < tempPath.size(); i++){
-            System.out.print("Node: " + tempPath.get(i).getValue());
-            if(tempPath.get(i).getGenerationRight() != null){
-                System.out.print(" Linked: " + tempPath.get(i).getGenerationRight().getValue());
-            }
-            System.out.println();
-        }*/
+//        System.out.println("\nTest 1");
+//        for (PathNode pathNode : tempPath) {
+//            System.out.print("Node: " + pathNode.getValue());
+//            if (pathNode.getGenerationRight() != null) {
+//                System.out.print(" Linked: " + pathNode.getGenerationRight().getValue());
+//            }
+//            System.out.println();
+//        }
 
         //Test left and right
-        for(int i = 0; i < tempPath.size(); i++){
-            System.out.println("Node: " + tempPath.get(i).getValue() + " Left: " +
-                    tempPath.get(i).getLeft().getValue() +
-                    " Right: " + tempPath.get(i).getRight().getValue());
-        }
+//        System.out.println("\nTest 2");
+//        for (PathNode pathNode : tempPath) {
+//            System.out.println("Node: " + pathNode.getValue() + " Left: " +
+//                    pathNode.getLeft().getValue() +
+//                    " Right: " + pathNode.getRight().getValue());
+//        }
 
 
         //This is used to test if the last node isLastNode correctly
-        /**for(int i = 0; i < this.tempPath.size(); i++){
-            System.out.println(tempPath.get(i).getValue() + " " + tempPath.get(i).isLastNode());
-        }*/
+//        System.out.println("\nTest 3");
+//        for (PathNode pathNode : this.tempPath) {
+//            System.out.println(pathNode.getValue() + " " + pathNode.isLastNode());
+//        }
 
 
         //This is used to test to make sure all the nodes are read in correctly
         //If there is more than 30 nodes total, add 30+32 to intArray
-/**     Integer[] intArray = new Integer[]{2, 6, 14, 30};
-        List<Integer> intList = new ArrayList<>(Arrays.asList(intArray));
-        System.out.println(this.root.getValue());
-            for(int i = 1; i < tempPath.size(); i++){
-                System.out.print(tempPath.get(i).getValue() + " ");
-                if(intList.contains(i)){
-                    System.out.println();
-                }
-            }*/
+//        System.out.println("\nTest 4");
+//        Integer[] intArray = new Integer[]{2, 6, 14, 30};
+//        List<Integer> intList = new ArrayList<>(Arrays.asList(intArray));
+//        System.out.println(this.root.getValue());
+//        for(int i = 1; i < tempPath.size(); i++){
+//            System.out.print(tempPath.get(i).getValue() + " ");
+//            if(intList.contains(i)){
+//                System.out.println();
+//            }
+//        }
+
+        System.out.println();
 
         createOutputFiles(outputFilename);
 
