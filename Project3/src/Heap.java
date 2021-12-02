@@ -2,7 +2,11 @@ import java.util.*;
 import java.io.*;
 
 /**
- *
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * @Author Dillon Gorlesky
+ * @Author Johathyn Strong
+ * @Version 1.0
+ * @Date 12/01/2021
  */
 public class Heap {
     /** Temporary storage for the paths starting at tempPath[1]. */
@@ -84,6 +88,11 @@ public class Heap {
          }
      }
 
+    /**
+     *
+     * @param pathFound
+     * @return
+     */
     public ArrayList<Integer> settingPath(String[] pathFound){
         ArrayList<Integer> newList = new ArrayList<Integer>();
         for(int i = 0; i < pathFound.length; i++){
@@ -228,6 +237,10 @@ public class Heap {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public String doArrows(){
         String msg = "";
         int len = tempPath.size()-1;
@@ -248,6 +261,10 @@ public class Heap {
         return msg;
     }
 
+    /**
+     *
+     * @return
+     */
     public String doWhile(){
         String msg = "";
         PathNode node = this.root;
@@ -291,21 +308,28 @@ public class Heap {
         return msg;
     }
 
-
+    /**
+     *
+     * @param node
+     * @param i
+     * @return
+     */
     public String getFormat(PathNode node, int i){
         String msg = "";
-        // Outputs first index value
-        msg += "\t" + i + "[label=\"";
-        // Outputs the number of edges between nodes
-        msg += node.getPath().size() - 1 + "(";
-        // Outputs the first path value
-        msg += node.getPath().get(ZERO);
-        // Outputs every path value after
-        for (int j = 1; j < node.getPath().size(); j++) {
-            msg +=  ", " + node.getPath().get(j);
+        if(node.getValue() != 9999){
+            // Outputs first index value
+            msg += "\t" + i + "[label=\"";
+            // Outputs the number of edges between nodes
+            msg += node.getPath().size() - 1 + "(";
+            // Outputs the first path value
+            msg += node.getPath().get(ZERO);
+            // Outputs every path value after
+            for (int j = 1; j < node.getPath().size(); j++) {
+                msg += ", " + node.getPath().get(j);
+            }
+            // Outputs the ending styling
+            msg += ")\"];\n";
         }
-        // Outputs the ending styling
-        msg += ")\"];\n";
         return msg;
     }
 

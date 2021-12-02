@@ -1,12 +1,17 @@
 import java.io.*;
 
 /**
- *
+ * This is the driver of the program. It makes sure the command line arguments are valid before
+ * calling heap to perform the rest of the tasks.
+ * @Author Dillon Gorlesky
+ * @Author Johathyn Strong
+ * @Version 1.0
+ * @Date 12/01/2021
  */
 public class Driver {
 
     /**
-     *
+     * This is the main class which handles command line arguments and exceptions from Heap.
      * @param args command line arguments
      */
     public static void main(String[] args){
@@ -36,11 +41,8 @@ public class Driver {
             System.exit(1);
         }
 
-        //Create variables here
-
         try{
             //Call go method
-            System.out.println("Calling Heap.go()");
             Heap heap = new Heap();
             heap.go(args[0], args[1]);
         } catch(Exception e){
