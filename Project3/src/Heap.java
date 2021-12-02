@@ -5,13 +5,13 @@ import java.io.*;
  *
  */
 public class Heap {
-
     /** Temporary storage for the paths starting at tempPath[1]. */
     private ArrayList<PathNode> tempPath;
 
     /** Output files for before and after the heapify of a tree */
     private File before, after;
 
+    /** The name of the output files to be written to*/
     private String label;
 
     /** Root of the tree */
@@ -19,6 +19,12 @@ public class Heap {
 
     /** This reads in the file */
     private Scanner scan;
+
+    /** For a constant of value 1 */
+    static final int ONE = 1;
+
+    /** For a constant of value 0 */
+    static final int ZERO = 0;
 
     /**
      * Constructor for a new Heap
@@ -162,10 +168,37 @@ public class Heap {
     /**
      * Prints the path lengths from left-to-right at each level in the tree in the form specified
      * by the instructions.
-     * @param root Root of the whole tree to begin printing from.
+     * Outputs graph to the before and after file depending on parameter.
+     * If time == 0, write to before
+     * Else time == 1, write to after
+     * @param time Which file needs to be written to.
      */
-    public void printTreeLevels(PathNode root){
+    public void printTreeLevels(int time){
+        try {
+            FileWriter fileBefore;
+            if(time == 0){
+                fileBefore = new FileWriter(this.before.getName());
+                fileBefore.write("digraph " + label + "Before{\n");
+            } else {
+                fileBefore = new FileWriter(this.after.getName());
+                fileBefore.write("digraph " + label + "After{\n");
+            }
+            // Outputs the first half of the file
+            fileBefore.write(doWhile());
 
+            // Outputs the second half of the file
+            fileBefore.write(doArrows());
+
+
+            fileBefore.write("}");
+            fileBefore.close();
+        } catch(IOException e) {
+            System.out.println("An error occurred in outputBefore file.");
+            System.out.println("Usage: java Driver file.txt <label>");
+            e.printStackTrace();
+            scan.close();
+            System.exit(1);
+        }
     }
 
 
@@ -195,130 +228,79 @@ public class Heap {
         }
     }
 
-    /**
-     * Outputs graph to the before and after file depending on parameter.
-     * If time == 0, write to before
-     * Else time == 1, write to after
-     * @param time Which file needs to be written to.
-     */
-    public void outputBefore(int time) {
-        try {
-            String pathing = "";
-            FileWriter fileBefore;
-            if(time == 0){
-                fileBefore = new FileWriter(this.before.getName());
-                fileBefore.write("digraph " + label + "Before{\n");
-            } else {
-                fileBefore = new FileWriter(this.after.getName());
-                fileBefore.write("digraph " + label + "After{\n");
+    public String doArrows(){
+        String msg = "";
+        int len = tempPath.size()-1;
+        int i1 = 1;
+        int i2 = 0;
+        for(int i = 0; i < len; i++){
+            if(i1 < len) {
+                msg += "\t" + i2 + " -> " + i1 + ";\n";
+                i1++;
+                msg += "\t" + i2 + " -> " + i1 + ";\n";
+                i2++;
+                i1++;
             }
-            // First half styling example  ->  (index)[label="(num edges)(path)"];
-            // Outputs the first half of the file
-            for (int i = 0; i < this.tempPath.size(); i++) {
-                // Outputs first index value
-                fileBefore.write("\t" + i + "[label=\"");
-                // Outputs the number of edges between nodes
-                pathing = tempPath.get(i).getPath().size() - 1 + "";
-                fileBefore.write(pathing + "(");
-                // Outputs the first path value
-                fileBefore.write(String.valueOf(this.tempPath.get(i).getPath().get(0)));
-                // Outputs every path value after
-                for (int j = 1; j < this.tempPath.get(i).getPath().size(); j++) {
-                    fileBefore.write( ", " + this.tempPath.get(i).getPath().get(j));
-                }
-                // Outputs the ending styling
-                fileBefore.write(")\"];\n");
-            }
-            // Outputs the second half of the file
-            for (int index = 0; index < this.tempPath.size(); index++) {
-                // Outputs the connections for 0
-                if (index == 0) {
-                    fileBefore.write("\t" + index + " -> " + (index+1) + ";\n");
-                    fileBefore.write("\t" + index + " -> " + (index+2) + ";\n");
-                } else { // Outputs the connections for every other value
-                    // Check if there is a left child
-                    if (!((2*index) > this.tempPath.size()-1)) {
-                        fileBefore.write("\t" + index + " -> " + (2*index) + ";\n");
-                    }
-                    // Check if there is a right child
-                    if (!((2*index+1) > this.tempPath.size()-1)) {
-                        fileBefore.write("\t" + index + " -> " + (2*index+1) + ";\n");
-                    }
-                }
-            }
-            fileBefore.write("}");
-            fileBefore.close();
-        } catch(IOException e) {
-            System.out.println("An error occurred in outputBefore file.");
-            System.out.println("Usage: java Driver file.txt <label>");
-            e.printStackTrace();
-            scan.close();
-            System.exit(1);
         }
+        if(len % 2 != 0){
+            msg += "\t" + i2 + " -> " + i1 + ";\n";
+        }
+        return msg;
     }
 
-    public void outputBefore2(int time) {
-        try {
-            FileWriter fileBefore;
-            if(time == 0){
-                fileBefore = new FileWriter(this.before.getName());
-                fileBefore.write("digraph " + label + "Before{\n");
-            } else {
-                fileBefore = new FileWriter(this.after.getName());
-                fileBefore.write("digraph " + label + "After{\n");
-            }
-            // First half styling example  ->  (index)[label="(num edges)(path)"];
-            // Outputs the first half of the file
-            PathNode node = this.root;
-            PathNode node2 = null;
-            fileBefore.write(getFormat(node, 0));
-            int i = 1;
-            while(node.getLeft().getValue() != 9999){
-                System.out.println("Node : " + node.getValue());
-                while(node2 != null){
-                    System.out.println("Node 2: " + node2.getValue());
-                    if(node2.getGenerationRight() != null){
-                        System.out.println(getFormat(node2, i));
-                        fileBefore.write(getFormat(node2, i));
-                        node2 = node2.getGenerationRight();
-
-                    } else {
-                        System.out.println(getFormat(node2, i));
-                        fileBefore.write(getFormat(node2, i));
-                        node2 = null;
-                    }
-                    i++;
+    public String doWhile(){
+        String msg = "";
+        PathNode node = this.root;
+        PathNode node2 = null;
+        msg += getFormat(node, 0);
+        int i = 1;
+        while(node.getLeft().getValue() != 9999){
+            while(node2 != null){
+                if(node2.getGenerationRight() != null){
+                    msg += getFormat(node2, i);
+                    node2 = node2.getGenerationRight();
+                } else {
+                    msg += getFormat(node2, i);
+                    node2 = null;
                 }
-                node = node.getLeft();
-                node2 = node.getGenerationRight();
-                fileBefore.write(getFormat(node, i));
-                System.out.println(getFormat(node, i));
                 i++;
             }
-
-
-            // Outputs the second half of the file
-
-
-
-
-            fileBefore.write("}");
-            fileBefore.close();
-        } catch(IOException e) {
-            System.out.println("An error occurred in outputBefore file.");
-            System.out.println("Usage: java Driver file.txt <label>");
-            e.printStackTrace();
-            scan.close();
-            System.exit(1);
+            node = node.getLeft();
+            node2 = node.getGenerationRight();
+            msg += getFormat(node, i);
+            i++;
         }
+        node2 = node.getGenerationRight();
+        while(node2 != null){
+            if(node2.getGenerationRight() != null) {
+                if (node2.getGenerationRight().getValue() != 9999) {
+                    msg += getFormat(node2, i);
+                    i++;
+                    node2 = node2.getGenerationRight();
+                } else {
+                    msg += getFormat(node2, i);
+                    i++;
+                    node2 = null;
+                }
+            } else {
+                msg += getFormat(node2, i);
+                i++;
+                node2 = null;
+            }
+        }
+        return msg;
     }
 
 
     public String getFormat(PathNode node, int i){
         String msg = "";
+        // Outputs first index value
         msg += "\t" + i + "[label=\"";
+        // Outputs the number of edges between nodes
         msg += node.getPath().size() - 1 + "(";
-        msg += node.getPath().get(0);
+        // Outputs the first path value
+        msg += node.getPath().get(ZERO);
+        // Outputs every path value after
         for (int j = 1; j < node.getPath().size(); j++) {
             msg +=  ", " + node.getPath().get(j);
         }
@@ -329,14 +311,16 @@ public class Heap {
 
 
     /**
-     * Runs the heap program
+     * Runs all the functions to read in the input file, build a tree, initialize all fields such
+     * as isLevelEnd, Generation links, etc, then performs a min heap and writes a before
+     * and after to a dot file to make a visualization from.
      * @param inputFilename Name of file with data points in it
      * @param outputFilename Name to create output files off of
      */
     public void go(String inputFilename, String outputFilename) {
         readPaths(inputFilename);
-        buildCompleteTree(0,0);
-        this.root = this.tempPath.get(0);
+        buildCompleteTree(ZERO,ZERO);
+        this.root = this.tempPath.get(ZERO);
         this.label = outputFilename;
 
         setLevelEnd(root);
@@ -383,7 +367,7 @@ public class Heap {
 
         createOutputFiles(outputFilename);
 
-        outputBefore(0);
+        printTreeLevels(ZERO);
 
         //Do min heap
 
@@ -391,6 +375,6 @@ public class Heap {
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc)
 
 
-        outputBefore2(1);
+        printTreeLevels(ONE);
     }
 }
