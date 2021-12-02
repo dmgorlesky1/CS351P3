@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.util.*;
 import java.io.*;
 
@@ -217,8 +218,8 @@ public class Heap {
      */
     public void createOutputFiles(String filename) {
         try {
-            this.before = new File(filename + "Before.txt");
-            this.after = new File(filename + "After.txt");
+            this.before = new File(filename + "Before.dot");
+            this.after = new File(filename + "After.dot");
 
             if (!this.before.createNewFile()) {
                 System.out.println("WARNING: " + this.before.getName() +
@@ -333,6 +334,88 @@ public class Heap {
         return msg;
     }
 
+    //steps to get starting node in min sort
+    // 1) traverse left child till you reach the end
+    // 2) save that node to CurrentLevel
+    // 3) move to the right through the generation till you reach the last added node
+    // 4) check the value of the last added node to the value of the nodes parent
+    //  if the value is smaller swap with the parent and continue
+    //  else do nothing
+    public void minSort() {
+        PathNode currentLevel = this.root;
+        ArrayList<PathNode> levelNodes = new ArrayList<>();
+        while (currentLevel.getLeft().getValue() != 9999) { // Getting the bottom level of the graph
+            currentLevel = currentLevel.getLeft();
+        } // Saving the beginning of the level
+        PathNode current = currentLevel;
+        while (current.hasGenerationRight()) { // Getting the last added node
+            levelNodes.add(current);
+            current = current.getGenerationRight();
+        }
+        for (int i = (levelNodes.size()-1); i >= 0; i--) { // May cause infinite loop
+            if (levelNodes.get(i).getValue() < levelNodes.get(i).getParent().getValue()) {
+                // Saving all needed values for use when swapping
+                PathNode B = levelNodes.get(i);
+                PathNode BgenLeft = i-1 == -1 ? null : levelNodes.get(i-1);
+                PathNode A = levelNodes.get(i).getParent();
+                PathNode currentParent = B.getParent();
+                PathNode currentLeft = B.getLeft();
+                PathNode currentRight = B.getRight();
+                PathNode currentGenRight = B.getGenerationRight();
+
+                PathNode parentParent = A.getParent();
+                PathNode parentLeft = A.getLeft();
+                PathNode parentRight = A.getRight();
+                PathNode parentGenRight = A.getGenerationRight();
+
+                // Swapping current node
+
+                B.setParent(A.getParent());
+                PathNode Bleft = B.getLeft(), Bright = B.getRight(), BgenRight = B.getGenerationRight();
+                if (A.getLeft() == B) {
+                    B.setLeft(A);
+                    B.setRight(A.getRight());
+                } else {
+                    B.setLeft(A.getLeft());
+                    B.setRight(A);
+                }
+                B.setGenerationRight(A.getGenerationRight());
+
+                A.setParent(B);
+                A.setLeft(Bleft);
+                A.setRight(Bright);
+                A.setGenerationRight(BgenRight);
+
+                if (BgenLeft != null) {
+                    BgenLeft.setGenerationRight(A);
+                }
+
+                // If current node is the left
+//                if (levelNodes.get(i).getParent().getLeft() == levelNodes.get(i)) {
+//                    levelNodes.get(i).setLeft(levelNodes.get(i).getParent());
+//                } else {
+//                    levelNodes.get(i).setLeft(parentLeft);
+//                }
+                // If current node is the right
+//                if (levelNodes.get(i).getParent().getRight() == levelNodes.get(i)) {
+//                    levelNodes.get(i).setRight(levelNodes.get(i).getParent());
+//                } else {
+//                    levelNodes.get(i).setRight(parentRight);
+//                }
+//                levelNodes.get(i).setGenerationRight(parentGenRight);
+//                levelNodes.get(i).setParent(parentParent);
+                // Swapping parent node
+//                levelNodes.get(i).getParent().setParent(levelNodes.get(i));
+//                levelNodes.get(i).getParent().setLeft(currentLeft);
+//                levelNodes.get(i).getParent().setRight(currentRight);
+//                levelNodes.get(i).getParent().setGenerationRight(currentGenRight);
+
+                this.setGenerationLinks(this.root);
+            }
+            // else do nothing
+        }
+    }
+
 
     /**
      * Runs all the functions to read in the input file, build a tree, initialize all fields such
@@ -397,7 +480,7 @@ public class Heap {
 
 
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc)
-
+        minSort();
 
         printTreeLevels(ONE);
     }
