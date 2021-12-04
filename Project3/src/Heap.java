@@ -187,6 +187,7 @@ public class Heap {
      * @param time Which file needs to be written to.
      */
     public void printTreeLevels(int time){
+        System.out.println("Running printTreeLevels...");
         try {
             FileWriter fileBefore;
             if(time == 0){
@@ -270,13 +271,16 @@ public class Heap {
      * @return
      */
     public String doWhile(){
+        System.out.println("Running doWhile...");
         String msg = "";
         PathNode node = this.root;
         PathNode node2 = null;
         msg += getFormat(node, 0);
         int i = 1;
         while(node.getLeft().getValue() != 9999){
+            System.out.println("node.getLeft() value = " + node.getLeft().getValue());
             while(node2 != null){
+                System.out.println("node2 = " + node2.toString());
                 if(node2.getGenerationRight() != null){
                     msg += getFormat(node2, i);
                     node2 = node2.getGenerationRight();
@@ -354,8 +358,8 @@ public class Heap {
         for (int i = this.treeDepth-1; i >= 0; i--) { // Cycling through the levels of the tree
             int levelSize = findLevelSize(getLevel(this.root, i));
             PathNode currentLevel = getLevel(this.root, i);
-            PathNode parentLevel = getLevel(this.root, (i-1));
-            for (int j = levelSize-1; j >= 0; j--) { // Cycling through the nodes of a level
+            PathNode parentLevel = i >= 0 ? getLevel(this.root, (i-1)) : null;
+            for (int j = levelSize; j >= 0; j--) { // Cycling through the nodes of a level
                 System.out.println("i = " + i + "  j = " + j);
                 // Bottom node
                 PathNode b = getLevelNode(currentLevel, j);
@@ -363,10 +367,11 @@ public class Heap {
 
                 // Parent node
                 PathNode a = b.getParent();
-                PathNode aLeft = getLeftNode(parentLevel, a);
+                PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
 
                 if (b.getValue() < a.getValue()) {
                     swapNodeValues(a, aLeft, b, bLeft);
+//                    printTreeLevels(1);
                 }
             }
         }
@@ -408,14 +413,14 @@ public class Heap {
      */
     public int findLevelSize(PathNode level) {
         int levelSize = 0;
-        while (level.getValue() != 9999 || level.getGenerationRight() != null) {
-            System.out.println("level.getValue = " + level.getValue() +
-                    "\nlevel.getGenerationRight() = ");
-            if (levelSize == 20) {
+        System.out.println("findLevelSize running...");
+        while (level.getValue() != 9999 && level.getGenerationRight() != null) {
+//            System.out.println("level.getValue = " + level.getValue() +
+//                    "\nlevel.getGenerationRight() = ");
+            if (levelSize == 9) {
                 System.out.println("Infinite loop detected");
                 break;
             }
-            System.out.println("findLevelSize running...");
             levelSize++;
             level = level.getGenerationRight();
         }
@@ -432,7 +437,7 @@ public class Heap {
      */
     public PathNode getLevel(PathNode root, int index) {
         if (index < this.treeDepth) {
-            if (index == 0) {
+            if (index <= 0) {
                 return root;
             }
 
@@ -450,8 +455,9 @@ public class Heap {
      * @param currentNode Node to find the left generational node of
      * @return Left generational node of the currentNode
      */
+    // TODO maybe causes infinite loop
     public PathNode getLeftNode(PathNode levelNode, PathNode currentNode) {
-        if (levelNode == currentNode) {
+        if (levelNode == currentNode || levelNode.getGenerationRight() == null) {
             return levelNode;
         }
 
@@ -498,9 +504,21 @@ public class Heap {
      */
     private void swapNodeValues(PathNode a, PathNode aLeft, PathNode b, PathNode bleft) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
+        // Swapping a.parent.child = b
+        PathNode c = a.getParent();
+        if (c != null) {
+            if (c.getLeft() == a) {
+                c.setLeft(b);
+            } else {
+                c.setRight(b);
+            }
+        }
+
+        // Swapping b.parent = a.parent and a.parent = b
         b.setParent(a.getParent());
         a.setParent(b);
 
+        // Swapping a.child -> b
         if (a.getLeft() == b) {
             PathNode tempRight = a.getRight();
             a.setLeft(b.getLeft());
@@ -517,20 +535,18 @@ public class Heap {
             b.setLeft(templeft);
         }
 
+        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
         PathNode tempGenRight = a.getGenerationRight();
         a.setGenerationRight(b.getGenerationRight());
         b.setGenerationRight(tempGenRight);
+
+        // Swapping a's genLeft with b and b's genLeft with a
         if (aLeft != a) {
             aLeft.setGenerationRight(b);
         }
         if (bleft != b) {
             bleft.setGenerationRight(a);
         }
-
-
-//        int temp = a.getValue();
-//        a.setValue(b.getValue());
-//        b.setValue(temp);
     }
 
 
