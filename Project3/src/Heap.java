@@ -1,4 +1,3 @@
-import java.nio.file.Path;
 import java.util.*;
 import java.io.*;
 
@@ -22,6 +21,9 @@ public class Heap {
     /** Root of the tree */
     private PathNode root;
 
+    /** Size of the tree */
+    private int treeDepth;
+
     /** This reads in the file */
     private Scanner scan;
 
@@ -37,6 +39,7 @@ public class Heap {
     public Heap(){
         this.tempPath = new ArrayList<>();
         this.root = null;
+        this.treeDepth = 0;
         this.label = "";
     }
 
@@ -334,96 +337,167 @@ public class Heap {
         return msg;
     }
 
-    //steps to get starting node in min sort
-    // 1) traverse left child till you reach the end
-    // 2) save that node to CurrentLevel
-    // 3) move to the right through the generation till you reach the last added node
-    // 4) check the value of the last added node to the value of the nodes parent
-    //  if the value is smaller swap with the parent and continue
-    //  else do nothing
-//    public void minSort() {
-//        PathNode currentLevel = this.root;
-//        ArrayList<PathNode> levelNodes = new ArrayList<>();
-//        while (currentLevel.getLeft().getValue() != 9999) { // Getting the bottom level of the graph
-//            currentLevel = currentLevel.getLeft();
-//        } // Saving the beginning of the level
-//        PathNode current = currentLevel;
-//        while (current.hasGenerationRight()) { // Getting the last added node
-//            levelNodes.add(current);
-//            current = current.getGenerationRight();
-//        }
-//        for (int i = (levelNodes.size()-1); i >= 0; i--) { // May cause infinite loop
-//            if (levelNodes.get(i).getValue() < levelNodes.get(i).getParent().getValue()) {
-//                // Saving all needed values for use when swapping
-//                PathNode B = levelNodes.get(i);
-//                PathNode BgenLeft = i-1 == -1 ? null : levelNodes.get(i-1);
-//                PathNode A = levelNodes.get(i).getParent();
-//                PathNode currentParent = B.getParent();
-//                PathNode currentLeft = B.getLeft();
-//                PathNode currentRight = B.getRight();
-//                PathNode currentGenRight = B.getGenerationRight();
-//
-//                PathNode parentParent = A.getParent();
-//                PathNode parentLeft = A.getLeft();
-//                PathNode parentRight = A.getRight();
-//                PathNode parentGenRight = A.getGenerationRight();
-//
-//                // Swapping current node
-//
-//                B.setParent(A.getParent());
-//                PathNode Bleft = B.getLeft(), Bright = B.getRight(), BgenRight = B.getGenerationRight();
-//                if (A.getLeft() == B) {
-//                    B.setLeft(A);
-//                    B.setRight(A.getRight());
-//                } else {
-//                    B.setLeft(A.getLeft());
-//                    B.setRight(A);
-//                }
-//                B.setGenerationRight(A.getGenerationRight());
-//
-//                A.setParent(B);
-//                A.setLeft(Bleft);
-//                A.setRight(Bright);
-//                A.setGenerationRight(BgenRight);
-//
-//                if (BgenLeft != null) {
-//                    BgenLeft.setGenerationRight(A);
-//                }
-//
-//                this.setGenerationLinks(this.root);
-//            }
-//            // else do nothing
-//        }
-//    }
+//    steps to get starting node in min sort
+//    1) traverse left child till you reach the end
+//    2) save that node to CurrentLevel
+//    3) move to the right through the generation till you reach the last added node
+//    4) check the value of the last added node to the value of the nodes parent
+//      -if the value is smaller swap with the parent and continue
+//      -else do nothing
+//       a        b
+//      / \  ->  / \
+//     b        a
+    /**
+     * Min sorts the binary tree
+     */
+    public void minSort() {
+        for (int i = this.treeDepth-1; i >= 0; i--) { // Cycling through the levels of the tree
+            int levelSize = findLevelSize(getLevel(this.root, i));
+            PathNode currentLevel = getLevel(this.root, i);
+            PathNode parentLevel = getLevel(this.root, (i-1));
+            for (int j = levelSize-1; j >= 0; j--) { // Cycling through the nodes of a level
+                System.out.println("i = " + i + "  j = " + j);
+                // Bottom node
+                PathNode b = getLevelNode(currentLevel, j);
+                PathNode bLeft = getLeftNode(currentLevel, b);
 
-    public <T extends Comparable<T>> void heapifyTree(PathNode root) {
+                // Parent node
+                PathNode a = b.getParent();
+                PathNode aLeft = getLeftNode(parentLevel, a);
+
+                if (b.getValue() < a.getValue()) {
+                    swapNodeValues(a, aLeft, b, bLeft);
+                }
+            }
+        }
+    }
+
+    /**
+     * Find a node in a level based off of an index
+     * @param levelRoot Root node of the level
+     * @param index Index of wanted node
+     * @return Node at index in level
+     */
+    public PathNode getLevelNode(PathNode levelRoot, int index) {
+        // Loop till moved to wanted level
+        if (index == 0) {
+            return levelRoot;
+        } else {
+            return getLevelNode(levelRoot.getGenerationRight(), (index-1));
+        }
+    }
+
+    /**
+     * Find the total depth of the tree using the root
+     * @param root Root of a tree
+     */
+    public void findTreeDepth(PathNode root) {
         if (root == null) {
+            // Removing extra count due to null child to the left of the final node
+            this.treeDepth--;
             return;
         }
-
-        heapifyTree(root.getLeft());
-        heapifyTree(root.getRight());
-        bubbleDown(root);
+        this.treeDepth++;
+        findTreeDepth(root.getLeft());
     }
 
-    private void bubbleDown(PathNode node) {
-        PathNode smallestNode = node;
-
-        if (node.getLeft() != null && node.getLeft().getValue() < node.getValue()) {
-            smallestNode = node.getLeft();
+    /**
+     * Find the length of the current level
+     * @param level Starting node of the level
+     * @return Size of the length
+     */
+    public int findLevelSize(PathNode level) {
+        int levelSize = 0;
+        while (level.getValue() != 9999 || level.getGenerationRight() != null) {
+            System.out.println("level.getValue = " + level.getValue() +
+                    "\nlevel.getGenerationRight() = ");
+            if (levelSize == 20) {
+                System.out.println("Infinite loop detected");
+                break;
+            }
+            System.out.println("findLevelSize running...");
+            levelSize++;
+            level = level.getGenerationRight();
         }
+        return levelSize;
+    }
 
-        if (node.getRight() != null && node.getRight().getValue() < node.getValue()) {
-            smallestNode = node.getRight();
-        }
+    // Vertical movement, thinks of levels as a linked list using the leftmost node as the
+    // starting node
+    /**
+     * Travels the graph to the left to get the starting node of a wanted level
+     * @param root Root of the tree
+     * @param index Index of the level to stop at
+     * @return Starting node of the selected node
+     */
+    public PathNode getLevel(PathNode root, int index) {
+        if (index < this.treeDepth) {
+            if (index == 0) {
+                return root;
+            }
 
-        if (smallestNode != node) {
-            swapNodeValues(node, smallestNode);
-            bubbleDown(smallestNode);
+            return getLevel(root.getLeft(), (index-1));
+        } else {
+            return root;
         }
     }
 
-    private void swapNodeValues(PathNode a, PathNode b) {
+    // Horizontal movement, thinks the level is a LinkedList and uses getGenerationalRight to
+    // move through it
+    /**
+     * Horizontal movement of the levels, used to find the node right before currentNode
+     * @param levelNode Starting node in the level
+     * @param currentNode Node to find the left generational node of
+     * @return Left generational node of the currentNode
+     */
+    public PathNode getLeftNode(PathNode levelNode, PathNode currentNode) {
+        if (levelNode == currentNode) {
+            return levelNode;
+        }
+
+        if (levelNode.getGenerationRight().equals(currentNode)) {
+            return levelNode;
+        }
+        return getLeftNode(levelNode.getGenerationRight(), currentNode);
+    }
+
+//    public void heapifyTree(PathNode root) {
+//        if (root == null) {
+//            return;
+//        }
+//
+//        heapifyTree(root.getLeft());
+//        heapifyTree(root.getRight());
+//        bubbleDown(root);
+//    }
+//
+//    private void bubbleDown(PathNode node) {
+//        PathNode smallestNode = node;
+//
+//        if (node.getLeft() != null && node.getLeft().getValue() < node.getValue()) {
+//            smallestNode = node.getLeft();
+//        }
+//
+//        if (node.getRight() != null && node.getRight().getValue() < node.getValue()) {
+//            smallestNode = node.getRight();
+//        }
+//
+//        if (smallestNode != node) {
+//            swapNodeValues(node, smallestNode);
+//            bubbleDown(smallestNode);
+//        }
+//    }
+//
+
+    /**
+     *
+     * @param a
+     * @param aLeft
+     * @param b
+     * @param bleft
+     */
+    private void swapNodeValues(PathNode a, PathNode aLeft, PathNode b, PathNode bleft) {
+        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         b.setParent(a.getParent());
         a.setParent(b);
 
@@ -431,12 +505,14 @@ public class Heap {
             PathNode tempRight = a.getRight();
             a.setLeft(b.getLeft());
             b.setLeft(a);
+
             a.setRight(b.getRight());
             b.setRight(tempRight);
         } else { // Else b is on the right
             PathNode templeft = a.getLeft();
             a.setRight(b.getLeft());
             b.setRight(a);
+
             a.setLeft(b.getLeft());
             b.setLeft(templeft);
         }
@@ -444,6 +520,13 @@ public class Heap {
         PathNode tempGenRight = a.getGenerationRight();
         a.setGenerationRight(b.getGenerationRight());
         b.setGenerationRight(tempGenRight);
+        if (aLeft != a) {
+            aLeft.setGenerationRight(b);
+        }
+        if (bleft != b) {
+            bleft.setGenerationRight(a);
+        }
+
 
 //        int temp = a.getValue();
 //        a.setValue(b.getValue());
@@ -514,8 +597,10 @@ public class Heap {
 
 
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc)
-//        minSort();
-        heapifyTree(this.root);
+        // Finds the depth of the tree
+        findTreeDepth(this.root);
+        minSort();
+//        heapifyTree(this.root);
 
         printTreeLevels(ONE);
     }
