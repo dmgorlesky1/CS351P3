@@ -203,7 +203,6 @@ public class Heap {
             // Outputs the second half of the file
             fileBefore.write(doArrows());
 
-
             fileBefore.write("}");
             fileBefore.close();
         } catch(IOException e) {
@@ -222,8 +221,10 @@ public class Heap {
      */
     public void createOutputFiles(String filename) {
         try {
-            this.before = new File(filename + "Before.dot");
-            this.after = new File(filename + "After.dot");
+            this.before = new File(filename + "Before.txt");
+            this.after = new File(filename + "After.txt");
+            //this.before = new File(filename + "Before.dot");
+            //this.after = new File(filename + "After.dot");
 
             if (!this.before.createNewFile()) {
                 System.out.println("WARNING: " + this.before.getName() +
@@ -277,10 +278,9 @@ public class Heap {
         PathNode node2 = null;
         msg += getFormat(node, 0);
         int i = 1;
-        while(node.getLeft().getValue() != 9999){
+        while(node.getLeft() != null){
             System.out.println("node.getLeft() value = " + node.getLeft().getValue());
             while(node2 != null){
-                System.out.println("node2 = " + node2.toString());
                 if(node2.getGenerationRight() != null){
                     msg += getFormat(node2, i);
                     node2 = node2.getGenerationRight();
@@ -298,7 +298,7 @@ public class Heap {
         node2 = node.getGenerationRight();
         while(node2 != null){
             if(node2.getGenerationRight() != null) {
-                if (node2.getGenerationRight().getValue() != 9999) {
+                if (node2.getGenerationRight() != null) {
                     msg += getFormat(node2, i);
                     i++;
                     node2 = node2.getGenerationRight();
@@ -316,6 +316,24 @@ public class Heap {
         return msg;
     }
 
+    public boolean swap(PathNode node){
+        int left = node.getLeft().getValue();
+        int right = node.getRight().getValue();
+        int curr = node.getValue();
+
+        if(left < right){
+            if(left < curr){
+                return true;
+            }
+        } else {
+            if(right < curr){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      *
      * @param node
@@ -324,7 +342,7 @@ public class Heap {
      */
     public String getFormat(PathNode node, int i){
         String msg = "";
-        if(node.getValue() != 9999){
+        if(node != null){
             // Outputs first index value
             msg += "\t" + i + "[label=\"";
             // Outputs the number of edges between nodes
@@ -414,7 +432,7 @@ public class Heap {
     public int findLevelSize(PathNode level) {
         int levelSize = 0;
         System.out.println("findLevelSize running...");
-        while (level.getValue() != 9999 && level.getGenerationRight() != null) {
+        while (level != null && level.getGenerationRight() != null) {
 //            System.out.println("level.getValue = " + level.getValue() +
 //                    "\nlevel.getGenerationRight() = ");
             if (levelSize == 9) {
@@ -549,6 +567,16 @@ public class Heap {
         }
     }
 
+    public void doCleanup(){
+        for(int i = 0; i < tempPath.size(); i++){
+            if(tempPath.get(i).getLeft().getValue() == 9999){
+                tempPath.get(i).setLeft(null);
+            }
+            if(tempPath.get(i).getRight().getValue() == 9999){
+                tempPath.get(i).setRight(null);
+            }
+        }
+    }
 
     /**
      * Runs all the functions to read in the input file, build a tree, initialize all fields such
@@ -570,6 +598,7 @@ public class Heap {
         //Set generation links
         setGenerationLinks(root);
 
+        doCleanup();
         //Used to test generation links
         /**for(int i = 0; i < tempPath.size(); i++){
             System.out.print("Node: " + tempPath.get(i).getValue());
