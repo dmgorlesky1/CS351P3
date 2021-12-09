@@ -342,7 +342,7 @@ public class Heap {
      */
     public String getFormat(PathNode node, int i){
         String msg = "";
-        if(node != null){
+        if(node.getPath() != null){
             // Outputs first index value
             msg += "\t" + i + "[label=\"";
             // Outputs the number of edges between nodes
@@ -387,8 +387,13 @@ public class Heap {
                 PathNode a = b.getParent();
                 PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
 
+                if (i==0) {
+                    this.root = a;
+//                    break;
+                }
+
                 if (b.getValue() < a.getValue()) {
-                    swapNodeValues(a, aLeft, b, bLeft);
+                        swapNodes(a, aLeft, b, bLeft);
 //                    printTreeLevels(1);
                 }
             }
@@ -417,7 +422,7 @@ public class Heap {
     public void findTreeDepth(PathNode root) {
         if (root == null) {
             // Removing extra count due to null child to the left of the final node
-            this.treeDepth--;
+//            this.treeDepth--;
             return;
         }
         this.treeDepth++;
@@ -520,7 +525,7 @@ public class Heap {
      * @param b
      * @param bleft
      */
-    private void swapNodeValues(PathNode a, PathNode aLeft, PathNode b, PathNode bleft) {
+    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bleft) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         // Swapping a.parent.child = b
         PathNode c = a.getParent();
@@ -542,15 +547,17 @@ public class Heap {
             a.setLeft(b.getLeft());
             b.setLeft(a);
 
+            tempRight.setParent(b); // Sets the parent of the child opposite b to b
             a.setRight(b.getRight());
             b.setRight(tempRight);
         } else { // Else b is on the right
-            PathNode templeft = a.getLeft();
+            PathNode tempLeft = a.getLeft();
             a.setRight(b.getLeft());
             b.setRight(a);
 
+            tempLeft.setParent(b); // Sets the parent of the child opposite b to b
             a.setLeft(b.getLeft());
-            b.setLeft(templeft);
+            b.setLeft(tempLeft);
         }
 
         // Swapping a.genRight = b.genRight and b.genRight = a.genRight
