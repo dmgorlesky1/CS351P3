@@ -3,14 +3,13 @@ import java.io.*;
 
 /**
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * @Author Dillon Gorlesky
- * @Author Johathyn Strong
- * @Version 1.0
- * @Date 12/01/2021
+ * @author Dillon Gorlesky
+ * @author Johathyn Strong
+ * @version 1.0 - 12/09/2021
  */
 public class Heap {
     /** Temporary storage for the paths starting at tempPath[1]. */
-    private ArrayList<PathNode> tempPath;
+    private final ArrayList<PathNode> tempPath;
 
     /** Output files for before and after the heapify of a tree */
     private File before, after;
@@ -54,23 +53,23 @@ public class Heap {
          try{//Making a new scanner
              File file = new File(inputFile);
              scan = new Scanner(file);
-         } catch(FileNotFoundException fnfe){
+         } catch(FileNotFoundException noFile){
              System.out.println("File not found. Please check input and try again.");
              System.out.println("Usage: java Driver file.txt <label>");
              scan.close();
              System.exit(1);
          }
          boolean check;
-         String lining;
+         StringBuilder lining;
          String[] line;
          PathNode node;
          while(scan.hasNextLine()){//Skips empty lines and tabs
              check = false;
-             lining = "";
+             lining = new StringBuilder();
              line = scan.nextLine().split("\\s+");//splits line to get length
-             for(int i = 0; i < line.length; i++) {
-                 if(!line[i].equals("")) {
-                     lining += line[i] + " ";
+             for (String s : line) {
+                 if (!s.equals("")) {
+                     lining.append(s).append(" ");
                      check = true;
                  } else {
                      check = false;
@@ -78,8 +77,8 @@ public class Heap {
              }
              if(check) {
                  //New node added
-                 node = new PathNode(lining.split(" ").length - 1);
-                 node.setPath(settingPath(lining.split(" ")));
+                 node = new PathNode(lining.toString().split(" ").length - 1);
+                 node.setPath(settingPath(lining.toString().split(" ")));
                  this.tempPath.add(node);
              }
          }
@@ -93,14 +92,14 @@ public class Heap {
      }
 
     /**
-     *
-     * @param pathFound
-     * @return
+     * Sets the that each node follows
+     * @param pathFound Read in path associated to the Node
+     * @return List of the paths a node follows
      */
     public ArrayList<Integer> settingPath(String[] pathFound){
-        ArrayList<Integer> newList = new ArrayList<Integer>();
-        for(int i = 0; i < pathFound.length; i++){
-            newList.add(Integer.parseInt(pathFound[i]));
+        ArrayList<Integer> newList = new ArrayList<>();
+        for (String s : pathFound) {
+            newList.add(Integer.parseInt(s));
         }
         return newList;
     }
@@ -111,17 +110,18 @@ public class Heap {
      * into a complete binary tree in order of appearance in the text file.
      *
      * @param index Index of the current node in tempPath.
-     * @param parent Parent of the current node.
+//     * @param parent Parent of the current node.
      * @return A reference to the node just placed in the tree.
      */
-    public PathNode buildCompleteTree(int index, int parent) {
+    //TODO maybe delete parent parameter
+    public PathNode buildCompleteTree(int index) {//, int parent) {
         PathNode node = new PathNode();
         PathNode node2 = new PathNode();
         if(this.tempPath.size() > 2 * index + 1){
-            node = buildCompleteTree(2 * index + 1, index);
+            node = buildCompleteTree(2 * index + 1);//, index);
         }
         if(this.tempPath.size() > 2 * index + 2){
-            node2 = buildCompleteTree(2 * index + 2, index);
+            node2 = buildCompleteTree(2 * index + 2);//, index);
         }
 
         this.tempPath.get(index).setLeft(node);
@@ -244,139 +244,140 @@ public class Heap {
     }
 
     /**
-     *
-     * @return
+     * Formats the bottom part of the graph printout
+     * @return Bottom part of graph printout
      */
     public String doArrows(){
-        String msg = "";
+        StringBuilder msg = new StringBuilder();
         int len = tempPath.size()-1;
         int i1 = 1;
         int i2 = 0;
         for(int i = 0; i < len; i++){
             if(i1 < len) {
-                msg += "\t" + i2 + " -> " + i1 + ";\n";
+                msg.append("\t").append(i2).append(" -> ").append(i1).append(";\n");
                 i1++;
-                msg += "\t" + i2 + " -> " + i1 + ";\n";
+                msg.append("\t").append(i2).append(" -> ").append(i1).append(";\n");
                 i2++;
                 i1++;
             }
         }
         if(len % 2 != 0){
-            msg += "\t" + i2 + " -> " + i1 + ";\n";
+            msg.append("\t").append(i2).append(" -> ").append(i1).append(";\n");
         }
-        return msg;
+        return msg.toString();
     }
 
     /**
-     *
-     * @return
+     * Formats the top part of the graph printout
+     * @return Top part of graph printout
      */
     public String doWhile(){
         System.out.println("Running doWhile...");
-        String msg = "";
+        StringBuilder msg = new StringBuilder();
         PathNode node = this.root;
         PathNode node2 = null;
-        msg += getFormat(node, 0);
+        msg.append(getFormat(node, 0));
         int i = 1;
         while(node.getLeft() != null){
             System.out.println("node.getLeft() value = " + node.getLeft().getValue());
             while(node2 != null){
                 if(node2.getGenerationRight() != null){
-                    msg += getFormat(node2, i);
+                    msg.append(getFormat(node2, i));
                     node2 = node2.getGenerationRight();
                 } else {
-                    msg += getFormat(node2, i);
+                    msg.append(getFormat(node2, i));
                     node2 = null;
                 }
                 i++;
             }
             node = node.getLeft();
             node2 = node.getGenerationRight();
-            msg += getFormat(node, i);
+            msg.append(getFormat(node, i));
             i++;
         }
         node2 = node.getGenerationRight();
         while(node2 != null){
             if(node2.getGenerationRight() != null) {
                 if (node2.getGenerationRight() != null) {
-                    msg += getFormat(node2, i);
+                    msg.append(getFormat(node2, i));
                     i++;
                     node2 = node2.getGenerationRight();
                 } else {
-                    msg += getFormat(node2, i);
+                    msg.append(getFormat(node2, i));
                     i++;
                     node2 = null;
                 }
             } else {
-                msg += getFormat(node2, i);
+                msg.append(getFormat(node2, i));
                 i++;
                 node2 = null;
             }
         }
-        return msg;
+        return msg.toString();
     }
 
-    public boolean swap(PathNode node){
-        int left = node.getLeft().getValue();
-        int right = node.getRight().getValue();
-        int curr = node.getValue();
-
-        if(left < right){
-            if(left < curr){
-                return true;
-            }
-        } else {
-            if(right < curr){
-                return true;
-            }
-        }
-
-        return false;
-    }
+    // REPLACED WITH swapNodes()
+//    public boolean swap(PathNode node){
+//        int left = node.getLeft().getValue();
+//        int right = node.getRight().getValue();
+//        int curr = node.getValue();
+//
+//        if(left < right){
+//            if(left < curr){
+//                return true;
+//            }
+//        } else {
+//            if(right < curr){
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
     /**
-     *
-     * @param node
-     * @param i
-     * @return
+     * Formats a node's path for the graph printout
+     * @param node Current node
+     * @param i Index of current node in graph
+     * @return Formatted output of current nodes path
      */
     public String getFormat(PathNode node, int i){
-        String msg = "";
+        StringBuilder msg = new StringBuilder();
         if(node.getPath() != null){
             // Outputs first index value
-            msg += "\t" + i + "[label=\"";
+            msg.append("\t").append(i).append("[label=\"");
             // Outputs the number of edges between nodes
-            msg += node.getPath().size() - 1 + "(";
+            msg.append(node.getPath().size() - 1).append("(");
             // Outputs the first path value
-            msg += node.getPath().get(ZERO);
+            msg.append(node.getPath().get(ZERO));
             // Outputs every path value after
             for (int j = 1; j < node.getPath().size(); j++) {
-                msg += ", " + node.getPath().get(j);
+                msg.append(", ").append(node.getPath().get(j));
             }
             // Outputs the ending styling
-            msg += ")\"];\n";
+            msg.append(")\"];\n");
         }
-        return msg;
+        return msg.toString();
     }
 
-//    steps to get starting node in min sort
-//    1) traverse left child till you reach the end
-//    2) save that node to CurrentLevel
-//    3) move to the right through the generation till you reach the last added node
-//    4) check the value of the last added node to the value of the nodes parent
-//      -if the value is smaller swap with the parent and continue
-//      -else do nothing
-//       a        b
-//      / \  ->  / \
-//     b        a
     /**
      * Min sorts the binary tree
+     *     steps to get starting node in min sort
+     *     1) traverse left child till you reach the end
+     *     2) save that node to CurrentLevel
+     *     3) move to the right through the generation till you reach the last added node
+     *     4) check the value of the last added node to the value of the nodes parent
+     *       -if the value is smaller swap with the parent and continue
+     *       -else do nothing
+     *        a        b
+     *       / \  ->  / \
+     *      b        a
      */
     public void minSort() {
         for (int i = this.treeDepth-1; i >= 0; i--) { // Cycling through the levels of the tree
             int levelSize = findLevelSize(getLevel(this.root, i));
             PathNode currentLevel = getLevel(this.root, i);
-            PathNode parentLevel = i >= 0 ? getLevel(this.root, (i-1)) : null;
+            PathNode parentLevel = getLevel(this.root, i-1);
             for (int j = levelSize; j >= 0; j--) { // Cycling through the nodes of a level
                 System.out.println("i = " + i + "  j = " + j);
                 // Bottom node
@@ -394,7 +395,6 @@ public class Heap {
 
                 if (b.getValue() < a.getValue()) {
                         swapNodes(a, aLeft, b, bLeft);
-//                    printTreeLevels(1);
                 }
             }
         }
@@ -421,8 +421,6 @@ public class Heap {
      */
     public void findTreeDepth(PathNode root) {
         if (root == null) {
-            // Removing extra count due to null child to the left of the final node
-//            this.treeDepth--;
             return;
         }
         this.treeDepth++;
@@ -439,7 +437,7 @@ public class Heap {
         System.out.println("findLevelSize running...");
         while (level != null && level.getGenerationRight() != null) {
 //            System.out.println("level.getValue = " + level.getValue() +
-//                    "\nlevel.getGenerationRight() = ");
+//                    "\n level.getGenerationRight() = ");
             if (levelSize == 9) {
                 System.out.println("Infinite loop detected");
                 break;
@@ -478,7 +476,6 @@ public class Heap {
      * @param currentNode Node to find the left generational node of
      * @return Left generational node of the currentNode
      */
-    // TODO maybe causes infinite loop
     public PathNode getLeftNode(PathNode levelNode, PathNode currentNode) {
         if (levelNode == currentNode || levelNode.getGenerationRight() == null) {
             return levelNode;
@@ -490,42 +487,14 @@ public class Heap {
         return getLeftNode(levelNode.getGenerationRight(), currentNode);
     }
 
-//    public void heapifyTree(PathNode root) {
-//        if (root == null) {
-//            return;
-//        }
-//
-//        heapifyTree(root.getLeft());
-//        heapifyTree(root.getRight());
-//        bubbleDown(root);
-//    }
-//
-//    private void bubbleDown(PathNode node) {
-//        PathNode smallestNode = node;
-//
-//        if (node.getLeft() != null && node.getLeft().getValue() < node.getValue()) {
-//            smallestNode = node.getLeft();
-//        }
-//
-//        if (node.getRight() != null && node.getRight().getValue() < node.getValue()) {
-//            smallestNode = node.getRight();
-//        }
-//
-//        if (smallestNode != node) {
-//            swapNodeValues(node, smallestNode);
-//            bubbleDown(smallestNode);
-//        }
-//    }
-//
-
     /**
-     *
-     * @param a
-     * @param aLeft
-     * @param b
-     * @param bleft
+     * Swaps 2 given nodes
+     * @param a Parent of node to the swapped
+     * @param aLeft The node to the left of the parent node
+     * @param b Current node to be swapped
+     * @param bLeft The node to the left of the current node
      */
-    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bleft) {
+    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         // Swapping a.parent.child = b
         PathNode c = a.getParent();
@@ -569,32 +538,35 @@ public class Heap {
         if (aLeft != a) {
             aLeft.setGenerationRight(b);
         }
-        if (bleft != b) {
-            bleft.setGenerationRight(a);
+        if (bLeft != b) {
+            bLeft.setGenerationRight(a);
         }
     }
 
+    /**
+     * Cleans tempPath Nodes, replacing filler values with null
+     */
     public void doCleanup(){
-        for(int i = 0; i < tempPath.size(); i++){
-            if(tempPath.get(i).getLeft().getValue() == 9999){
-                tempPath.get(i).setLeft(null);
+        for (PathNode pathNode : tempPath) {
+            if (pathNode.getLeft().getValue() == 9999) {
+                pathNode.setLeft(null);
             }
-            if(tempPath.get(i).getRight().getValue() == 9999){
-                tempPath.get(i).setRight(null);
+            if (pathNode.getRight().getValue() == 9999) {
+                pathNode.setRight(null);
             }
         }
     }
 
     /**
      * Runs all the functions to read in the input file, build a tree, initialize all fields such
-     * as isLevelEnd, Generation links, etc, then performs a min heap and writes a before
+     * as isLevelEnd, Generation links, etc., then performs a min heap and writes a before
      * and after to a dot file to make a visualization from.
      * @param inputFilename Name of file with data points in it
      * @param outputFilename Name to create output files off of
      */
     public void go(String inputFilename, String outputFilename) {
         readPaths(inputFilename);
-        buildCompleteTree(ZERO,ZERO);
+        buildCompleteTree(ZERO);//,ZERO);
         this.root = this.tempPath.get(ZERO);
         this.label = outputFilename;
 
@@ -607,52 +579,48 @@ public class Heap {
 
         doCleanup();
         //Used to test generation links
-        /**for(int i = 0; i < tempPath.size(); i++){
-            System.out.print("Node: " + tempPath.get(i).getValue());
-            if(tempPath.get(i).getGenerationRight() != null){
-                System.out.print(" Linked: " + tempPath.get(i).getGenerationRight().getValue());
-            }
-            System.out.println();
-        }*/
+//        for(int i = 0; i < tempPath.size(); i++){
+//            System.out.print("Node: " + tempPath.get(i).getValue());
+//            if(tempPath.get(i).getGenerationRight() != null){
+//                System.out.print(" Linked: " + tempPath.get(i).getGenerationRight().getValue());
+//            }
+//            System.out.println();
+//        }
 
         //Test left and right
-        /**for(int i = 0; i < tempPath.size(); i++){
-            System.out.println("Node: " + tempPath.get(i).getValue() + " Left: " +
-                    tempPath.get(i).getLeft().getValue() +
-                    " Right: " + tempPath.get(i).getRight().getValue());
-        }*/
+//        for(int i = 0; i < tempPath.size(); i++){
+//            System.out.println("Node: " + tempPath.get(i).getValue() + " Left: " +
+//                    tempPath.get(i).getLeft().getValue() +
+//                    " Right: " + tempPath.get(i).getRight().getValue());
+//        }
 
 
         //This is used to test if the last node isLastNode correctly
-        /**for(int i = 0; i < this.tempPath.size(); i++){
-            System.out.println(tempPath.get(i).getValue() + " " + tempPath.get(i).isLastNode());
-        }*/
+//        for(int i = 0; i < this.tempPath.size(); i++){
+//            System.out.println(tempPath.get(i).getValue() + " " + tempPath.get(i).isLastNode());
+//        }
 
 
         //This is used to test to make sure all the nodes are read in correctly
         //If there is more than 30 nodes total, add 30+32 to intArray
-/**     Integer[] intArray = new Integer[]{2, 6, 14, 30};
-        List<Integer> intList = new ArrayList<>(Arrays.asList(intArray));
-        System.out.println(this.root.getValue());
-            for(int i = 1; i < tempPath.size(); i++){
-                System.out.print(tempPath.get(i).getValue() + " ");
-                if(intList.contains(i)){
-                    System.out.println();
-                }
-            }*/
+//        Integer[] intArray = new Integer[]{2, 6, 14, 30};
+//        List<Integer> intList = new ArrayList<>(Arrays.asList(intArray));
+//        System.out.println(this.root.getValue());
+//            for(int i = 1; i < tempPath.size(); i++){
+//                System.out.print(tempPath.get(i).getValue() + " ");
+//                if(intList.contains(i)){
+//                    System.out.println();
+//                }
+//            }
 
         createOutputFiles(outputFilename);
 
         printTreeLevels(ZERO);
 
-        //Do min heap
-
-
-        //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc)
+        //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc.)
         // Finds the depth of the tree
         findTreeDepth(this.root);
         minSort();
-//        heapifyTree(this.root);
 
         printTreeLevels(ONE);
     }
