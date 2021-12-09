@@ -3,10 +3,9 @@ import java.io.*;
 /**
  * This is the driver of the program. It makes sure the command line arguments are valid before
  * calling heap to perform the rest of the tasks.
- * @Author Dillon Gorlesky
- * @Author Johathyn Strong
- * @Version 1.0
- * @Date 12/01/2021
+ * @author Dillon Gorlesky
+ * @author Johathyn Strong
+ * @version 1.0 - 12/01/2021
  */
 public class Driver {
 
