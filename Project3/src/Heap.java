@@ -301,7 +301,7 @@ public class Heap {
                 if (node2.getGenerationRight() != null) {
                     msg.append(getFormat(node2, i));
                     i++;
-                    node2 = node2.getGenerationRight();
+                    node2 = (node2 == node2.getGenerationRight()) ? null : node2.getGenerationRight();
                 } else {
                     msg.append(getFormat(node2, i));
                     i++;
@@ -390,24 +390,26 @@ public class Heap {
                 }
 
                 if (level == 1) {
-                    flowDown(b, 1);
-                }
-
-                // Parent node
-                try {
-                    PathNode a = b.getParent();
-                    System.out.println("a = " + a.getValue() + " a.path = " + a.getPath().toString());
-                    PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
-                    if (level==0) {
-                        this.root = a;
+                    System.out.println("\nStopping before root\n");
+                    flowDown(b.getParent(), 0);// should flow down the root
+                    level = 0;
+                } else {
+                    try {
+                        // Parent node
+                        PathNode a = b.getParent();
+                        System.out.println("a = " + a.getValue() + " a.path = " + a.getPath().toString());
+                        PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
+                        if (level==0) {
+                            this.root = a;
 //                        break;
-                    }
+                        }
 
-                    if (b.getValue() < a.getValue()) {
-                        bubbleUp(a, aLeft, b, bLeft, level);
+                        if (b.getValue() < a.getValue()) {
+                            bubbleUp(a, aLeft, b, bLeft, level);
+                        }
+                    } catch (NullPointerException e) {
+                        System.out.println("a is NULL");
                     }
-                } catch (NullPointerException e) {
-                    System.out.println("a is NULL");
                 }
             }
         }
@@ -506,24 +508,23 @@ public class Heap {
      * @param currentLevel level of the current node
      */
     public void flowDown(PathNode a, int currentLevel) {
-        if (a.getValue() > a.getLeft().getValue()) {
-
-        } else { // If "a" is larger than its right child
-
+        PathNode smallestChild = (a.getLeft().getValue() < a.getRight().getValue()) ?
+                a.getLeft() : a.getRight();
+        if (a.getLeft().getValue() == a.getRight().getValue()) {
+            smallestChild = a.getLeft();
         }
+        if (a.getValue() > smallestChild.getValue()) {
+            swapNodes(a, smallestChild, 1);
+        }
+//        if (a.getValue() > a.getLeft().getValue()) {
+//            swapNodes(a, a.getLeft(), 1);
+//        } else { // If "a" is larger than its right child
+//            swapNodes(a, a.getRight(), 1);
+//        }
     }
 
-    /**
-     * Bubbles up a node if it is less then its parent
-     * @param a Parent of node to the swapped
-     * @param aLeft The node to the left of the parent node
-     * @param b Current node to be swapped
-     * @param bLeft The node to the left of the current node
-     */
-    private void bubbleUp(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
-                          int currentLevel) {
+    public void swapNodes(PathNode a, PathNode b, int mode) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
-        // Swapping a.parent.child = b
         PathNode c = a.getParent();
         if (c != null) {
             if (c.getLeft() == a) {
@@ -559,28 +560,95 @@ public class Heap {
         }
 
         setGenerationLinks(this.root);
-//        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
-//        PathNode tempGenRight = a.getGenerationRight();
-//        a.setGenerationRight(b.getGenerationRight());
-//        b.setGenerationRight(tempGenRight);
-//
-//        // Swapping a's genLeft with b and b's genLeft with a
-//        if (aLeft != a) {
-//            aLeft.setGenerationRight(b);
-//        }
-//        if (bLeft != b) {
-//            bLeft.setGenerationRight(a);
-//        }
+        if (mode == 0) {
+            if (b.getValue() < b.getParent().getValue()) {
+                a = b.getParent();
+                swapNodes(a, b, 0);
+            }
+        } else if (mode == 1) {
+            PathNode smallestChild = (a.getLeft().getValue() < a.getRight().getValue()) ?
+                    a.getLeft() : a.getRight();
+            if (a.getValue() > smallestChild.getValue()) {
+                swapNodes(a, smallestChild, 1);
+            }
 
-        if (b.getValue() < b.getParent().getValue()) {
-            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
-            bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);//fix value
-            a = b.getParent();
-            aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);//fix value
-            bubbleUp(a, aLeft, b, bLeft, currentLevel-1);
-        } else {
-            resetRoot(b);
+//            if (a.getValue() > a.getLeft().getValue()) {
+//                swapNodes(a, a.getLeft(), 1);
+//            } else {
+//                swapNodes(a, a.getRight(), 1);
+//            }
         }
+    }
+
+    /**
+     * Bubbles up a node if it is less then its parent
+     * @param a Parent of node to the swapped
+     * @param aLeft The node to the left of the parent node
+     * @param b Current node to be swapped
+     * @param bLeft The node to the left of the current node
+     */
+    private void bubbleUp(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
+                          int currentLevel) {
+//        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
+        swapNodes(a, b, 0);
+//        // Swapping a.parent.child = b
+//        PathNode c = a.getParent();
+//        if (c != null) {
+//            if (c.getLeft() == a) {
+//                c.setLeft(b);
+//            } else {
+//                c.setRight(b);
+//            }
+//        } else {
+//            this.root = b;
+//        }
+//
+//        // Swapping b.parent = a.parent and a.parent = b
+//        b.setParent(a.getParent());
+//        a.setParent(b);
+//
+//        // Swapping a.child -> b
+//        if (a.getLeft() == b) {
+//            PathNode tempRight = a.getRight();
+//            a.setLeft(b.getLeft());
+//            b.setLeft(a);
+//
+//            tempRight.setParent(b); // Sets the parent of the child opposite b to b
+//            a.setRight(b.getRight());
+//            b.setRight(tempRight);
+//        } else { // Else b is on the right
+//            PathNode tempLeft = a.getLeft();
+//            a.setRight(b.getLeft());
+//            b.setRight(a);
+//
+//            tempLeft.setParent(b); // Sets the parent of the child opposite b to b
+//            a.setLeft(b.getLeft());
+//            b.setLeft(tempLeft);
+//        }
+//
+//        setGenerationLinks(this.root);
+////        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
+////        PathNode tempGenRight = a.getGenerationRight();
+////        a.setGenerationRight(b.getGenerationRight());
+////        b.setGenerationRight(tempGenRight);
+////
+////        // Swapping a's genLeft with b and b's genLeft with a
+////        if (aLeft != a) {
+////            aLeft.setGenerationRight(b);
+////        }
+////        if (bLeft != b) {
+////            bLeft.setGenerationRight(a);
+////        }
+//
+//        if (b.getValue() < b.getParent().getValue()) {
+//            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
+//            bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);//fix value
+//            a = b.getParent();
+//            aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);//fix value
+//            bubbleUp(a, aLeft, b, bLeft, currentLevel-1);
+//        } else {
+//            resetRoot(b);
+//        }
     }
 
     /**
