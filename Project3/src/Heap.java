@@ -276,9 +276,12 @@ public class Heap {
         PathNode node2 = null;
         msg.append(getFormat(node, 0));
         int i = 1;
-        while(node.getLeft() != null){
+        int j = 0;
+        while(node != null){
             while(node2 != null){
                 if(node2.getGenerationRight() != null){
+                 //   System.out.println(node2 == node2.getGenerationRight());
+                 //   System.out.println("checking: "+ node2.getGenerationRight().getValue());
                     msg.append(getFormat(node2, i));
                     node2 = node2.getGenerationRight();
                 } else {
@@ -288,28 +291,34 @@ public class Heap {
                 i++;
             }
             node = node.getLeft();
-            node2 = node.getGenerationRight();
             msg.append(getFormat(node, i));
+            if(node != null) {
+                node2 = node.getGenerationRight();
+            }
             i++;
         }
-        node2 = node.getGenerationRight();
-        while(node2 != null){
-            if(node2.getGenerationRight() != null) {
+        //node2 = node.getGenerationRight();
+        /**while(node2 != null){
+                System.out.println("Node 2: " + node2.getValue());
+                System.out.println("Node 2 left: " + node2.isPrinted());
+                System.out.println("Node 2 right: " + node2.getRight());
+                System.out.println("Node 2 par: " + node2.getParent());
                 if (node2.getGenerationRight() != null) {
-                    msg.append(getFormat(node2, i));
-                    i++;
-                    node2 = node2.getGenerationRight();
+                    if (node2.getGenerationRight() != null) {
+                        msg.append(getFormat(node2, i));
+                        i++;
+                        node2 = node2.getGenerationRight();
+                    } else {
+                        msg.append(getFormat(node2, i));
+                        i++;
+                        node2 = null;
+                    }
                 } else {
                     msg.append(getFormat(node2, i));
                     i++;
                     node2 = null;
                 }
-            } else {
-                msg.append(getFormat(node2, i));
-                i++;
-                node2 = null;
-            }
-        }
+        }*/
         return msg.toString();
     }
 
@@ -394,11 +403,10 @@ public class Heap {
                     } else {
                         this.root = a;
                     }
-//                    break;
-                }*/
+               }*/
                 if(a != null) {
                     if (b.getValue() < a.getValue()) {
-                        swapNodes(a, aLeft, b, bLeft);
+                        swapNodes(a, aLeft, b, bLeft, i);
                     }
                 }
             }
@@ -499,7 +507,7 @@ public class Heap {
      * @param b Current node to be swapped
      * @param bLeft The node to the left of the current node
      */
-    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft) {
+    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft, int currentLevel) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         // Swapping a.parent.child = b
         PathNode c = a.getParent();
@@ -550,6 +558,31 @@ public class Heap {
         }
         if (bLeft != b) {
             bLeft.setGenerationRight(a);
+        }
+
+        if (b.getValue() < b.getParent().getValue()) {
+            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
+            bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);
+            a = b.getParent();
+            aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);
+            swapNodes(a, aLeft, b, bLeft, currentLevel-1);
+        }
+
+        //setGenerationLinks(root);
+    }
+
+    public void removeNodes(){
+        PathNode t2 = null;
+        PathNode t = root;
+        while(t != null){
+            System.out.println("T value: " + t.getValue());
+            while(t2 != null && t2.getGenerationRight() != null){
+                System.out.println("T2 Generation: " + t2.getGenerationRight().getValue());
+                t2 = t2.getGenerationRight();
+            }
+            System.out.println("--------------------------");
+            t = t.getLeft();
+            t2 = t;
         }
     }
 
@@ -632,9 +665,9 @@ public class Heap {
         PathNode test = this.root;
         findTreeDepth(this.root);
         minSort();
-        setGenerationLinks(this.root);
+        //setGenerationLinks(this.root);
 
-        for(int i = 0; i < tempPath.size(); i++){
+/**        for(int i = 0; i < tempPath.size(); i++){
             System.out.println("Node: " + tempPath.get(i).getValue());
             if(tempPath.get(i).getLeft() != null){
                 System.out.println("Node Left: " + tempPath.get(i).getLeft().getValue());
@@ -647,10 +680,9 @@ public class Heap {
                 System.out.println("Node Right: null");
             }
             System.out.println("--------------------------------------");
-       }
-        minSort();
+       }*/
 
-        System.out.println("\n\nddddddddddddddddddddddddddddddddddddddddddddddddd");
+        //System.out.println("\n\nddddddddddddddddddddddddddddddddddddddddddddddddd");
         /**for(int i = 0; i < tempPath.size(); i++){
             System.out.println("Node: " + tempPath.get(i).getValue());
             if(tempPath.get(i).getLeft() != null){
@@ -665,13 +697,23 @@ public class Heap {
             }
             System.out.println("--------------------------------------");
         }*/
+        for(int i = 0; i < 10; i++) {
+            minSort();
+        }
+        System.out.println("\n\n\n");
         PathNode t = this.root;
         PathNode t2 = t.getGenerationRight();
         while(t != null){
             System.out.println("T value: " + t.getValue());
             while(t2 != null && t2.getGenerationRight() != null){
                 System.out.println("T2 Generation: " + t2.getGenerationRight().getValue());
+
                 t2 = t2.getGenerationRight();
+            }
+            if(t.getLeft() != null) {
+                System.out.println("T left: " + t.getLeft().getValue());
+            } else {
+                System.out.println("T left: null");
             }
             System.out.println("--------------------------");
             t = t.getLeft();
