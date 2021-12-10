@@ -535,6 +535,11 @@ public class Heap {
                 c.setRight(b);
             }
         } else {
+            if(a.getRight() == b){
+                System.out.println("inside else if");
+                System.out.println("left a val" + a.getLeft().getValue());
+                a.getLeft().setGenerationRight(a);
+            }
             //System.out.println("A is me: " + a.getValue());
             //System.out.println("B is me " + b.getValue());
             a.setGenerationRight(b.getGenerationRight());
@@ -543,6 +548,7 @@ public class Heap {
               //  System.out.println("A gen now : " + a.getGenerationRight().getValue());
            // }
             b.setGenerationRight(null);
+
             this.root = b;
         }
 
@@ -784,7 +790,7 @@ public class Heap {
         System.out.println("mmmmmmmmmmmmmmmmmmmmmm");
         minSort();
 //        System.out.println("Sort2\n");
-
+        minSort();
         printTreeLevels(ONE);
     }
 }
