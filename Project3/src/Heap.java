@@ -316,25 +316,6 @@ public class Heap {
         return msg.toString();
     }
 
-    // REPLACED WITH swapNodes()
-//    public boolean swap(PathNode node){
-//        int left = node.getLeft().getValue();
-//        int right = node.getRight().getValue();
-//        int curr = node.getValue();
-//
-//        if(left < right){
-//            if(left < curr){
-//                return true;
-//            }
-//        } else {
-//            if(right < curr){
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
-
     /**
      * Formats a node's path for the graph printout
      * @param node Current node
@@ -494,6 +475,7 @@ public class Heap {
      * @param b Current node to be swapped
      * @param bLeft The node to the left of the current node
      */
+    // TODO make recursive
     private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         // Swapping a.parent.child = b
