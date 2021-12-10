@@ -49,47 +49,47 @@ public class Heap {
      *
      * @param inputFile Name of the input file to be read.
      */
-    public void readPaths(String inputFile) {
-        try{//Making a new scanner
-            File file = new File(inputFile);
-            scan = new Scanner(file);
-        } catch(FileNotFoundException noFile){
-            System.out.println("File not found. Please check input and try again.");
-            System.out.println("Usage: java Driver file.txt <label>");
-            scan.close();
-            System.exit(1);
-        }
-        boolean check;
-        StringBuilder lining;
-        String[] line;
-        PathNode node;
-        while(scan.hasNextLine()){//Skips empty lines and tabs
-            check = false;
-            lining = new StringBuilder();
-            line = scan.nextLine().split("\\s+");//splits line to get length
-            for (String s : line) {
-                if (!s.equals("")) {
-                    lining.append(s).append(" ");
-                    check = true;
-                } else {
-                    check = false;
-                }
-            }
-            if(check) {
-                //New node added
-                node = new PathNode(lining.toString().split(" ").length - 1);
-                node.setPath(settingPath(lining.toString().split(" ")));
-                this.tempPath.add(node);
-            }
-        }
-        //Empty file
-        if(this.tempPath.size() < 1) {
-            System.out.print("Error: File given is empty. Please retry.");
-            System.out.println("Usage: java Driver file.txt <label>");
-            scan.close();
-            System.exit(1);
-        }
-    }
+     public void readPaths(String inputFile) {
+         try{//Making a new scanner
+             File file = new File(inputFile);
+             scan = new Scanner(file);
+         } catch(FileNotFoundException noFile){
+             System.out.println("File not found. Please check input and try again.");
+             System.out.println("Usage: java Driver file.txt <label>");
+             scan.close();
+             System.exit(1);
+         }
+         boolean check;
+         StringBuilder lining;
+         String[] line;
+         PathNode node;
+         while(scan.hasNextLine()){//Skips empty lines and tabs
+             check = false;
+             lining = new StringBuilder();
+             line = scan.nextLine().split("\\s+");//splits line to get length
+             for (String s : line) {
+                 if (!s.equals("")) {
+                     lining.append(s).append(" ");
+                     check = true;
+                 } else {
+                     check = false;
+                 }
+             }
+             if(check) {
+                 //New node added
+                 node = new PathNode(lining.toString().split(" ").length - 1);
+                 node.setPath(settingPath(lining.toString().split(" ")));
+                 this.tempPath.add(node);
+             }
+         }
+         //Empty file
+         if(this.tempPath.size() < 1) {
+             System.out.print("Error: File given is empty. Please retry.");
+             System.out.println("Usage: java Driver file.txt <label>");
+             scan.close();
+             System.exit(1);
+         }
+     }
 
     /**
      * Sets the that each node follows
@@ -110,7 +110,7 @@ public class Heap {
      * into a complete binary tree in order of appearance in the text file.
      *
      * @param index Index of the current node in tempPath.
-    //     * @param parent Parent of the current node.
+//     * @param parent Parent of the current node.
      * @return A reference to the node just placed in the tree.
      */
     //TODO maybe delete parent parameter
@@ -187,6 +187,7 @@ public class Heap {
      * @param time Which file needs to be written to.
      */
     public void printTreeLevels(int time){
+        System.out.println("Running printTreeLevels...");
         try {
             FileWriter fileBefore;
             if(time == 0){
@@ -271,17 +272,16 @@ public class Heap {
      * @return Top part of graph printout
      */
     public String doWhile(){
+        System.out.println("Running doWhile...");
         StringBuilder msg = new StringBuilder();
         PathNode node = this.root;
         PathNode node2 = null;
         msg.append(getFormat(node, 0));
         int i = 1;
-        int j = 0;
-        while(node != null){
+        while(node.getLeft() != null){
+            System.out.println("node.getLeft() value = " + node.getLeft().getValue());
             while(node2 != null){
                 if(node2.getGenerationRight() != null){
-                 //   System.out.println(node2 == node2.getGenerationRight());
-                 //   System.out.println("checking: "+ node2.getGenerationRight().getValue());
                     msg.append(getFormat(node2, i));
                     node2 = node2.getGenerationRight();
                 } else {
@@ -291,34 +291,28 @@ public class Heap {
                 i++;
             }
             node = node.getLeft();
+            node2 = node.getGenerationRight();
             msg.append(getFormat(node, i));
-            if(node != null) {
-                node2 = node.getGenerationRight();
-            }
             i++;
         }
-        //node2 = node.getGenerationRight();
-        /**while(node2 != null){
-                System.out.println("Node 2: " + node2.getValue());
-                System.out.println("Node 2 left: " + node2.isPrinted());
-                System.out.println("Node 2 right: " + node2.getRight());
-                System.out.println("Node 2 par: " + node2.getParent());
+        node2 = node.getGenerationRight();
+        while(node2 != null){
+            if(node2.getGenerationRight() != null) {
                 if (node2.getGenerationRight() != null) {
-                    if (node2.getGenerationRight() != null) {
-                        msg.append(getFormat(node2, i));
-                        i++;
-                        node2 = node2.getGenerationRight();
-                    } else {
-                        msg.append(getFormat(node2, i));
-                        i++;
-                        node2 = null;
-                    }
+                    msg.append(getFormat(node2, i));
+                    i++;
+                    node2 = (node2 == node2.getGenerationRight()) ? null : node2.getGenerationRight();
                 } else {
                     msg.append(getFormat(node2, i));
                     i++;
                     node2 = null;
                 }
-        }*/
+            } else {
+                msg.append(getFormat(node2, i));
+                i++;
+                node2 = null;
+            }
+        }
         return msg.toString();
     }
 
@@ -349,9 +343,6 @@ public class Heap {
      */
     public String getFormat(PathNode node, int i){
         StringBuilder msg = new StringBuilder();
-        if(node == null){
-            return "";
-        }
         if(node.getPath() != null){
             // Outputs first index value
             msg.append("\t").append(i).append("[label=\"");
@@ -399,23 +390,25 @@ public class Heap {
                 }
 
                 if (level == 1) {
-                    flowDown(b, 1);
-                }
+                    System.out.println("\nStopping before root\n");
+                    flowDown(b.getParent(), 0);// should flow down the root
+                    level = 0;
+                } else {
+                    try {
+                        // Parent node
+                        PathNode a = b.getParent();
+                        System.out.println("a = " + a.getValue() + " a.path = " + a.getPath().toString());
+                        PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
+                        if (level==0) {
+                            this.root = a;
+//                        break;
+                        }
 
-                // Parent node
-                PathNode a = b.getParent();
-                PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
-
-                /**if (i==0) {
-                    if(a == null){
-                        this.root = b;
-                    } else {
-                        this.root = a;
-                    }
-               }*/
-                if(a != null) {
-                    if (b.getValue() < a.getValue()) {
-                        swapNodes(a, aLeft, b, bLeft, i);
+                        if (b.getValue() < a.getValue()) {
+                            bubbleUp(a, aLeft, b, bLeft, level);
+                        }
+                    } catch (NullPointerException e) {
+                        System.out.println("a is NULL");
                     }
                 }
             }
@@ -515,24 +508,23 @@ public class Heap {
      * @param currentLevel level of the current node
      */
     public void flowDown(PathNode a, int currentLevel) {
-        if (a.getValue() > a.getLeft().getValue()) {
-
-        } else { // If "a" is larger than its right child
-
+        PathNode smallestChild = (a.getLeft().getValue() < a.getRight().getValue()) ?
+                a.getLeft() : a.getRight();
+        if (a.getLeft().getValue() == a.getRight().getValue()) {
+            smallestChild = a.getLeft();
         }
+        if (a.getValue() > smallestChild.getValue()) {
+            swapNodes(a, smallestChild, 1);
+        }
+//        if (a.getValue() > a.getLeft().getValue()) {
+//            swapNodes(a, a.getLeft(), 1);
+//        } else { // If "a" is larger than its right child
+//            swapNodes(a, a.getRight(), 1);
+//        }
     }
 
-    /**
-     * Bubbles up a node if it is less then its parent
-     * @param a Parent of node to the swapped
-     * @param aLeft The node to the left of the parent node
-     * @param b Current node to be swapped
-     * @param bLeft The node to the left of the current node
-     */
-    private void bubbleUp(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
-                          int currentLevel) {
+    public void swapNodes(PathNode a, PathNode b, int mode) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
-        // Swapping a.parent.child = b
         PathNode c = a.getParent();
         if (c != null) {
             if (c.getLeft() == a) {
@@ -554,11 +546,9 @@ public class Heap {
             a.setLeft(b.getLeft());
             b.setLeft(a);
 
-            if(tempRight != null) {
-                tempRight.setParent(b); // Sets the parent of the child opposite b to b
-                a.setRight(b.getRight());
-                b.setRight(tempRight);
-            }
+            tempRight.setParent(b); // Sets the parent of the child opposite b to b
+            a.setRight(b.getRight());
+            b.setRight(tempRight);
         } else { // Else b is on the right
             PathNode tempLeft = a.getLeft();
             a.setRight(b.getLeft());
@@ -570,28 +560,95 @@ public class Heap {
         }
 
         setGenerationLinks(this.root);
-//        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
-//        PathNode tempGenRight = a.getGenerationRight();
-//        a.setGenerationRight(b.getGenerationRight());
-//        b.setGenerationRight(tempGenRight);
-//
-//        // Swapping a's genLeft with b and b's genLeft with a
-//        if (aLeft != a) {
-//            aLeft.setGenerationRight(b);
-//        }
-//        if (bLeft != b) {
-//            bLeft.setGenerationRight(a);
-//        }
+        if (mode == 0) {
+            if (b.getValue() < b.getParent().getValue()) {
+                a = b.getParent();
+                swapNodes(a, b, 0);
+            }
+        } else if (mode == 1) {
+            PathNode smallestChild = (a.getLeft().getValue() < a.getRight().getValue()) ?
+                    a.getLeft() : a.getRight();
+            if (a.getValue() > smallestChild.getValue()) {
+                swapNodes(a, smallestChild, 1);
+            }
 
-        if (b.getValue() < b.getParent().getValue()) {
-            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
-            bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);//fix value
-            a = b.getParent();
-            aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);//fix value
-            bubbleUp(a, aLeft, b, bLeft, currentLevel-1);
-        } else {
-            resetRoot(b);
+//            if (a.getValue() > a.getLeft().getValue()) {
+//                swapNodes(a, a.getLeft(), 1);
+//            } else {
+//                swapNodes(a, a.getRight(), 1);
+//            }
         }
+    }
+
+    /**
+     * Bubbles up a node if it is less then its parent
+     * @param a Parent of node to the swapped
+     * @param aLeft The node to the left of the parent node
+     * @param b Current node to be swapped
+     * @param bLeft The node to the left of the current node
+     */
+    private void bubbleUp(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
+                          int currentLevel) {
+//        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
+        swapNodes(a, b, 0);
+//        // Swapping a.parent.child = b
+//        PathNode c = a.getParent();
+//        if (c != null) {
+//            if (c.getLeft() == a) {
+//                c.setLeft(b);
+//            } else {
+//                c.setRight(b);
+//            }
+//        } else {
+//            this.root = b;
+//        }
+//
+//        // Swapping b.parent = a.parent and a.parent = b
+//        b.setParent(a.getParent());
+//        a.setParent(b);
+//
+//        // Swapping a.child -> b
+//        if (a.getLeft() == b) {
+//            PathNode tempRight = a.getRight();
+//            a.setLeft(b.getLeft());
+//            b.setLeft(a);
+//
+//            tempRight.setParent(b); // Sets the parent of the child opposite b to b
+//            a.setRight(b.getRight());
+//            b.setRight(tempRight);
+//        } else { // Else b is on the right
+//            PathNode tempLeft = a.getLeft();
+//            a.setRight(b.getLeft());
+//            b.setRight(a);
+//
+//            tempLeft.setParent(b); // Sets the parent of the child opposite b to b
+//            a.setLeft(b.getLeft());
+//            b.setLeft(tempLeft);
+//        }
+//
+//        setGenerationLinks(this.root);
+////        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
+////        PathNode tempGenRight = a.getGenerationRight();
+////        a.setGenerationRight(b.getGenerationRight());
+////        b.setGenerationRight(tempGenRight);
+////
+////        // Swapping a's genLeft with b and b's genLeft with a
+////        if (aLeft != a) {
+////            aLeft.setGenerationRight(b);
+////        }
+////        if (bLeft != b) {
+////            bLeft.setGenerationRight(a);
+////        }
+//
+//        if (b.getValue() < b.getParent().getValue()) {
+//            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
+//            bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);//fix value
+//            a = b.getParent();
+//            aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);//fix value
+//            bubbleUp(a, aLeft, b, bLeft, currentLevel-1);
+//        } else {
+//            resetRoot(b);
+//        }
     }
 
     /**
@@ -603,13 +660,7 @@ public class Heap {
             currentNode = currentNode.getParent();
         }
         this.root = currentNode;
-
-
-
-
-        //setGenerationLinks(root);
     }
-
 
     /**
      * Cleans tempPath Nodes, replacing filler values with null
@@ -687,81 +738,12 @@ public class Heap {
 
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc.)
         // Finds the depth of the tree
-        PathNode test = this.root;
         findTreeDepth(this.root);
 //        System.out.println("Sort1\n");
         minSort();
+//        System.out.println("Sort2\n");
+//        minSort();
 
-
-/**        for(int i = 0; i < tempPath.size(); i++){
-            System.out.println("Node: " + tempPath.get(i).getValue());
-            if(tempPath.get(i).getLeft() != null){
-                System.out.println("Node Left: " + tempPath.get(i).getLeft().getValue());
-            } else {
-                System.out.println("Node Left: null");
-            }
-            if(tempPath.get(i).getRight() != null){
-                System.out.println("Node Right: " + tempPath.get(i).getRight().getValue());
-            } else {
-                System.out.println("Node Right: null");
-            }
-            System.out.println("--------------------------------------");
-       }*/
-
-        //System.out.println("\n\nddddddddddddddddddddddddddddddddddddddddddddddddd");
-        /**for(int i = 0; i < tempPath.size(); i++){
-            System.out.println("Node: " + tempPath.get(i).getValue());
-            if(tempPath.get(i).getLeft() != null){
-                System.out.println("Node Left: " + tempPath.get(i).getLeft().getValue());
-            } else {
-                System.out.println("Node Left: null");
-            }
-            if(tempPath.get(i).getRight() != null){
-                System.out.println("Node Right: " + tempPath.get(i).getRight().getValue());
-            } else {
-                System.out.println("Node Right: null");
-            }
-            System.out.println("--------------------------------------");
-        }*/
-        for(int i = 0; i < 10; i++) {
-            minSort();
-        }
-        System.out.println("\n\n\n");
-        PathNode t = this.root;
-        PathNode t2 = t.getGenerationRight();
-        while(t != null){
-            System.out.println("T value: " + t.getValue());
-            while(t2 != null && t2.getGenerationRight() != null){
-                System.out.println("T2 Generation: " + t2.getGenerationRight().getValue());
-
-                t2 = t2.getGenerationRight();
-            }
-            if(t.getLeft() != null) {
-                System.out.println("T left: " + t.getLeft().getValue());
-            } else {
-                System.out.println("T left: null");
-            }
-            System.out.println("--------------------------");
-            t = t.getLeft();
-            t2 = t;
-        }
-
-        System.out.println("Old root node: " + test.getValue());
-        if(test.getLeft() != null) {
-            System.out.println("Left: " + test.getLeft());
-        }  else {
-            System.out.println("Left: null");
-        }
-        if(test.getRight() != null){
-            System.out.println("Right: " + test.getRight());
-        } else {
-            System.out.println("Right: null");
-        }
-        if(test.getGenerationRight() != null){
-            System.out.println("Gen: " + test.getGenerationRight().getValue());
-        } else {
-            System.out.println("Gen: null");
-        }
         printTreeLevels(ONE);
     }
 }
