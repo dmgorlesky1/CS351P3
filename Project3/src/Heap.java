@@ -163,7 +163,6 @@ public class Heap {
             root.getLeft().setGenerationRight(root.getRight());
             //Right --> Parent --> Parents generation link --> Left
             if(root.getGenerationRight() != null){
-                System.out.println("==========================================="+root.getGenerationRight().hasLeft());
                 if(root.getGenerationRight().hasLeft()){
                     root.getRight().setGenerationRight(root.getGenerationRight().getLeft());
                 }
@@ -544,7 +543,7 @@ public class Heap {
     }
 
     public void swapNodes(PathNode a, PathNode b, int mode) {
-        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
+       // System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         PathNode c = a.getParent();
         //If c isn't root
         if (c != null) {
@@ -559,7 +558,7 @@ public class Heap {
                     a.setGenerationRight(a.getRight().getGenerationRight());
                     a.getLeft().setGenerationRight(a);
                 } else {
-                    System.out.println("here" + a.getPath() + " b " + b.getPath() + " aaa" + b.getGenerationRight().getPath());
+                   // System.out.println("here" + a.getPath() + " b " + b.getPath() + " aaa" + b.getGenerationRight().getPath());
                     a.setGenerationRight(b.getGenerationRight());
                     b.setGenerationRight(null);
                 }
@@ -572,18 +571,13 @@ public class Heap {
 
                 this.root = b;
             }
-            //}
         }
 
         // Swapping b.parent = a.parent and a.parent = b
         b.setParent(a.getParent());
         a.setParent(b);
-        System.out.println("A: " + a.getValue() +" " +  a.getPath() + " B: " + b.getValue() + " " + " b " + b.getPath());
-        //a.setGenerationRight(b.getGenerationRight());
-        //a.getGenerationRight().setGenerationRight(null);
-        // System.out.println("root: " + root.getValue());
 
-        setNull();
+        //setNull();
         setGenerationLinks(root);
 
         // Swapping a.child -> b
@@ -595,13 +589,9 @@ public class Heap {
             if(tempRight != null) {
                 tempRight.setParent(b); // Sets the parent of the child opposite b to b
             }
-
             a.setRight(b.getRight());
             b.setRight(tempRight);
             a.setGenerationRight(tempRight);
-            //if(b != root) b.getLeft().setGenerationRight(b.getLeft().getRight());
-            //else b.getLeft().setGenerationRight(b.getRight());
-
 
         } else { // Else b is on the right
             PathNode tempLeft = a.getLeft();
@@ -612,7 +602,7 @@ public class Heap {
             tempLeft.setGenerationRight(a);
             a.setLeft(b.getLeft());
             b.setLeft(tempLeft);
-            System.out.println("-------------------"+b.getLeft().getPath());
+            //System.out.println("-------------------"+b.getLeft().getPath());
 
         }
         print();
@@ -827,7 +817,7 @@ public class Heap {
         System.out.println("mmmmmmmmmmmmmmmmmmmmmm");
         minSort();
 //        System.out.println("Sort2\n");
-        minSort();
+        //System.out.println(root.getRight().getLeft().getPath());
         printTreeLevels(ONE);
     }
 }
