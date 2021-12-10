@@ -12,6 +12,8 @@ public class PathNode implements Comparable {
     /** Value the PathNode holds */
     private int value;
 
+    private boolean printed;
+
     /** An ArrayList of vertex IDs ordered by appearance in the path. */
     private ArrayList<Integer> path;
 
@@ -45,6 +47,7 @@ public class PathNode implements Comparable {
         this.isLevelEnd = false;
         this.isLastNode = false;
         this.generationRight = null;
+        this.printed = false;
     }
 
     /**
@@ -60,6 +63,15 @@ public class PathNode implements Comparable {
         this.isLevelEnd = false;
         this.isLastNode = false;
         this.generationRight = null;
+        this.printed = false;
+    }
+
+    public boolean isPrinted() {
+        return printed;
+    }
+
+    public void setPrinted(boolean printed) {
+        this.printed = printed;
     }
 
     /**
