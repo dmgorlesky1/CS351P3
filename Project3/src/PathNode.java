@@ -66,14 +66,6 @@ public class PathNode implements Comparable {
         this.printed = false;
     }
 
-    public boolean isPrinted() {
-        return printed;
-    }
-
-    public void setPrinted(boolean printed) {
-        this.printed = printed;
-    }
-
     /**
      * This function checks to see if the current node has a left-child node
      * @return true or false if child node found
