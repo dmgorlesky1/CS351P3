@@ -389,6 +389,9 @@ public class Heap {
                     System.out.println("b is NULL");
                 }
 
+                if (level == 1) {
+                    flowDown(b, 1);
+                }
 
                 // Parent node
                 try {
@@ -401,7 +404,7 @@ public class Heap {
                     }
 
                     if (b.getValue() < a.getValue()) {
-                        swapNodes(a, aLeft, b, bLeft, level);
+                        bubbleUp(a, aLeft, b, bLeft, level);
                     }
                 } catch (NullPointerException e) {
                     System.out.println("a is NULL");
@@ -498,15 +501,27 @@ public class Heap {
     }
 
     /**
-     * Swaps 2 given nodes
+     * Flows down a node if it is larger then one of its children
+     * @param a Current node
+     * @param currentLevel level of the current node
+     */
+    public void flowDown(PathNode a, int currentLevel) {
+        if (a.getValue() > a.getLeft().getValue()) {
+
+        } else { // If "a" is larger than its right child
+
+        }
+    }
+
+    /**
+     * Bubbles up a node if it is less then its parent
      * @param a Parent of node to the swapped
      * @param aLeft The node to the left of the parent node
      * @param b Current node to be swapped
      * @param bLeft The node to the left of the current node
      */
-    // TODO make recursive
-    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
-                           int currentLevel) {
+    private void bubbleUp(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
+                          int currentLevel) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         // Swapping a.parent.child = b
         PathNode c = a.getParent();
@@ -516,6 +531,8 @@ public class Heap {
             } else {
                 c.setRight(b);
             }
+        } else {
+            this.root = b;
         }
 
         // Swapping b.parent = a.parent and a.parent = b
@@ -541,25 +558,26 @@ public class Heap {
             b.setLeft(tempLeft);
         }
 
-        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
-        PathNode tempGenRight = a.getGenerationRight();
-        a.setGenerationRight(b.getGenerationRight());
-        b.setGenerationRight(tempGenRight);
-
-        // Swapping a's genLeft with b and b's genLeft with a
-        if (aLeft != a) {
-            aLeft.setGenerationRight(b);
-        }
-        if (bLeft != b) {
-            bLeft.setGenerationRight(a);
-        }
+        setGenerationLinks(this.root);
+//        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
+//        PathNode tempGenRight = a.getGenerationRight();
+//        a.setGenerationRight(b.getGenerationRight());
+//        b.setGenerationRight(tempGenRight);
+//
+//        // Swapping a's genLeft with b and b's genLeft with a
+//        if (aLeft != a) {
+//            aLeft.setGenerationRight(b);
+//        }
+//        if (bLeft != b) {
+//            bLeft.setGenerationRight(a);
+//        }
 
         if (b.getValue() < b.getParent().getValue()) {
             System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
             bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);//fix value
             a = b.getParent();
             aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);//fix value
-            swapNodes(a, aLeft, b, bLeft, currentLevel-1);
+            bubbleUp(a, aLeft, b, bLeft, currentLevel-1);
         } else {
             resetRoot(b);
         }
@@ -653,10 +671,10 @@ public class Heap {
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc.)
         // Finds the depth of the tree
         findTreeDepth(this.root);
-        System.out.println("Sort1\n");
+//        System.out.println("Sort1\n");
         minSort();
-        System.out.println("Sort2\n");
-        minSort();
+//        System.out.println("Sort2\n");
+//        minSort();
 
         printTreeLevels(ONE);
     }
