@@ -526,7 +526,7 @@ public class Heap {
     }
 
     public void swapNodes(PathNode a, PathNode b, int mode) {
-       // System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
+        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         PathNode c = a.getParent();
         if (c != null) {
             if (c.getLeft() == a) {
@@ -535,6 +535,14 @@ public class Heap {
                 c.setRight(b);
             }
         } else {
+            //System.out.println("A is me: " + a.getValue());
+            //System.out.println("B is me " + b.getValue());
+            a.setGenerationRight(b.getGenerationRight());
+            //if(b.getGenerationRight() != null){
+            //  System.out.println("B gen now : " + b.getGenerationRight().getValue());
+              //  System.out.println("A gen now : " + a.getGenerationRight().getValue());
+           // }
+            b.setGenerationRight(null);
             this.root = b;
         }
 
