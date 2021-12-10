@@ -515,16 +515,23 @@ public class Heap {
      */
     public void flowDown(PathNode a, int currentLevel) {
         System.out.println("size" + tempPath.size());
-        if(a.getLeft() != null && a.getRight()!= null) {
-            PathNode smallestChild = (a.getLeft().getValue() < a.getRight().getValue()) ?
-                    a.getLeft() : a.getRight();
+        if(a.getLeft() != null) {
             if(a.getRight() != null) {
-                if (a.getLeft().getValue() == a.getRight().getValue()) {
-                    smallestChild = a.getLeft();
+                PathNode smallestChild = (a.getLeft().getValue() < a.getRight().getValue()) ?
+                        a.getLeft() : a.getRight();
+                if (a.getRight() != null) {
+                    if (a.getLeft().getValue() == a.getRight().getValue()) {
+                        smallestChild = a.getLeft();
+                    }
                 }
-            }
-            if (a.getValue() > smallestChild.getValue()) {
-                swapNodes(a, smallestChild, 1);
+
+                if (a.getValue() > smallestChild.getValue()) {
+                    swapNodes(a, smallestChild, 1);
+                }
+            } else {
+                if(a.getValue() > a.getLeft().getValue()){
+                    swapNodes(a, a.getLeft(), 1);
+                }
             }
         }
 //        if (a.getValue() > a.getLeft().getValue()) {
@@ -541,25 +548,25 @@ public class Heap {
         if (c != null) {
             if (c.getLeft() == a) {
                 c.setLeft(b);
-                //a.setGenerationRight(b.getGenerationRight());
             } else {
                 c.setRight(b);
             }
-        } else {//C is root
-            System.out.println(a);
-            System.out.println(b);
+        } else {//a is root
             if(a.getLeft() != null){
                 if (a.getRight() == b) {
+                    a.setGenerationRight(a.getRight().getGenerationRight());
                     a.getLeft().setGenerationRight(a);
+                } else {
+                    System.out.println("here" + a.getPath() + " b " + b.getPath());
+                    a.setGenerationRight(b.getGenerationRight());
+                    b.setGenerationRight(null);
                 }
                 //System.out.println("A is me: " + a.getValue());
                 //System.out.println("B is me " + b.getValue());
-                a.setGenerationRight(b.getGenerationRight());
                 //if(b.getGenerationRight() != null){
                 //  System.out.println("B gen now : " + b.getGenerationRight().getValue());
                 //  System.out.println("A gen now : " + a.getGenerationRight().getValue());
                 // }
-                b.setGenerationRight(null);
 
                 this.root = b;
             }
@@ -569,8 +576,9 @@ public class Heap {
         // Swapping b.parent = a.parent and a.parent = b
         b.setParent(a.getParent());
         a.setParent(b);
-
-       // System.out.println("root: " + root.getValue());
+        System.out.println("A: " + a.getValue() +" " +  a.getPath() + " B: " + b.getValue() + " " + " b " + b.getPath());
+        a.setGenerationRight(b.getGenerationRight());
+        // System.out.println("root: " + root.getValue());
         setGenerationLinks(root);
 
         // Swapping a.child -> b
@@ -598,10 +606,10 @@ public class Heap {
         if (mode == 0) {
             if (b.getValue() < b.getParent().getValue()) {
                 a = b.getParent();
-                swapNodes(a, b, 0);
+                swapNodes(a, b, 1);
             }
-        } else if (mode == 1) {
-
+        }
+        if(mode == 1) {
             PathNode smallestChild = null;
             if (a.getLeft() == null) {
                 smallestChild = a.getRight();
@@ -804,11 +812,9 @@ public class Heap {
 //        System.out.println("Sort1\n");
         print();
         System.out.println("mmmmmmmmmmmmmmmmmmmmmm");
-        System.out.println(root.getValue());
         minSort();
 //        System.out.println("Sort2\n");
-        System.out.println(root.getValue());
-
+        minSort();
         printTreeLevels(ONE);
     }
 }
