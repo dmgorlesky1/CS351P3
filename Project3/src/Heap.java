@@ -559,7 +559,22 @@ public class Heap {
             b.setLeft(tempLeft);
         }
 
+        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
+        PathNode tempGenRight = a.getGenerationRight();
+        a.setGenerationRight(b.getGenerationRight());
+        b.setGenerationRight(tempGenRight);
+
         setGenerationLinks(this.root);
+
+//        // Swapping a's genLeft with b and b's genLeft with a
+//        if (aLeft != a) {
+//            aLeft.setGenerationRight(b);
+//        }
+//        if (bLeft != b) {
+//            bLeft.setGenerationRight(a);
+//        }
+
+
         if (mode == 0) {
             if (b.getValue() < b.getParent().getValue()) {
                 a = b.getParent();
@@ -636,20 +651,18 @@ public class Heap {
 //        }
 //
 //        setGenerationLinks(this.root);
-        //TODO move this to swapNodes!!!!
-
-        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
-        PathNode tempGenRight = a.getGenerationRight();
-        a.setGenerationRight(b.getGenerationRight());
-        b.setGenerationRight(tempGenRight);
-
-        // Swapping a's genLeft with b and b's genLeft with a
-        if (aLeft != a) {
-            aLeft.setGenerationRight(b);
-        }
-        if (bLeft != b) {
-            bLeft.setGenerationRight(a);
-        }
+//        // Swapping a.genRight = b.genRight and b.genRight = a.genRight
+//        PathNode tempGenRight = a.getGenerationRight();
+//        a.setGenerationRight(b.getGenerationRight());
+//        b.setGenerationRight(tempGenRight);
+//
+//        // Swapping a's genLeft with b and b's genLeft with a
+//        if (aLeft != a) {
+//            aLeft.setGenerationRight(b);
+//        }
+//        if (bLeft != b) {
+//            bLeft.setGenerationRight(a);
+//        }
 //
 //        if (b.getValue() < b.getParent().getValue()) {
 //            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
