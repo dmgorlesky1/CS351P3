@@ -415,7 +415,7 @@ public class Heap {
                }*/
                 if(a != null) {
                     if (b.getValue() < a.getValue()) {
-                        swapNodes(a, aLeft, b, bLeft, i);
+                        bubbleUp(a, aLeft, b, bLeft, level);
                     }
                 }
             }
