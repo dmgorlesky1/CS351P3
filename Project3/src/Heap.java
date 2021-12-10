@@ -49,47 +49,47 @@ public class Heap {
      *
      * @param inputFile Name of the input file to be read.
      */
-     public void readPaths(String inputFile) {
-         try{//Making a new scanner
-             File file = new File(inputFile);
-             scan = new Scanner(file);
-         } catch(FileNotFoundException noFile){
-             System.out.println("File not found. Please check input and try again.");
-             System.out.println("Usage: java Driver file.txt <label>");
-             scan.close();
-             System.exit(1);
-         }
-         boolean check;
-         StringBuilder lining;
-         String[] line;
-         PathNode node;
-         while(scan.hasNextLine()){//Skips empty lines and tabs
-             check = false;
-             lining = new StringBuilder();
-             line = scan.nextLine().split("\\s+");//splits line to get length
-             for (String s : line) {
-                 if (!s.equals("")) {
-                     lining.append(s).append(" ");
-                     check = true;
-                 } else {
-                     check = false;
-                 }
-             }
-             if(check) {
-                 //New node added
-                 node = new PathNode(lining.toString().split(" ").length - 1);
-                 node.setPath(settingPath(lining.toString().split(" ")));
-                 this.tempPath.add(node);
-             }
-         }
-         //Empty file
-         if(this.tempPath.size() < 1) {
-             System.out.print("Error: File given is empty. Please retry.");
-             System.out.println("Usage: java Driver file.txt <label>");
-             scan.close();
-             System.exit(1);
-         }
-     }
+    public void readPaths(String inputFile) {
+        try{//Making a new scanner
+            File file = new File(inputFile);
+            scan = new Scanner(file);
+        } catch(FileNotFoundException noFile){
+            System.out.println("File not found. Please check input and try again.");
+            System.out.println("Usage: java Driver file.txt <label>");
+            scan.close();
+            System.exit(1);
+        }
+        boolean check;
+        StringBuilder lining;
+        String[] line;
+        PathNode node;
+        while(scan.hasNextLine()){//Skips empty lines and tabs
+            check = false;
+            lining = new StringBuilder();
+            line = scan.nextLine().split("\\s+");//splits line to get length
+            for (String s : line) {
+                if (!s.equals("")) {
+                    lining.append(s).append(" ");
+                    check = true;
+                } else {
+                    check = false;
+                }
+            }
+            if(check) {
+                //New node added
+                node = new PathNode(lining.toString().split(" ").length - 1);
+                node.setPath(settingPath(lining.toString().split(" ")));
+                this.tempPath.add(node);
+            }
+        }
+        //Empty file
+        if(this.tempPath.size() < 1) {
+            System.out.print("Error: File given is empty. Please retry.");
+            System.out.println("Usage: java Driver file.txt <label>");
+            scan.close();
+            System.exit(1);
+        }
+    }
 
     /**
      * Sets the that each node follows
@@ -110,7 +110,7 @@ public class Heap {
      * into a complete binary tree in order of appearance in the text file.
      *
      * @param index Index of the current node in tempPath.
-//     * @param parent Parent of the current node.
+    //     * @param parent Parent of the current node.
      * @return A reference to the node just placed in the tree.
      */
     //TODO maybe delete parent parameter
@@ -187,7 +187,7 @@ public class Heap {
      * @param time Which file needs to be written to.
      */
     public void printTreeLevels(int time){
-        System.out.println("Running printTreeLevels...");
+       // System.out.println("Running printTreeLevels...");
         try {
             FileWriter fileBefore;
             if(time == 0){
@@ -272,14 +272,15 @@ public class Heap {
      * @return Top part of graph printout
      */
     public String doWhile(){
-        System.out.println("Running doWhile...");
+        //System.out.println("Running doWhile...");
         StringBuilder msg = new StringBuilder();
         PathNode node = this.root;
         PathNode node2 = null;
         msg.append(getFormat(node, 0));
         int i = 1;
         while(node.getLeft() != null){
-            System.out.println("node.getLeft() value = " + node.getLeft().getValue());
+         //   System.out.println("Node value: " + node.getValue());
+         //   System.out.println("node.getLeft() value = " + node.getLeft().getValue());
             while(node2 != null){
                 if(node2.getGenerationRight() != null){
                     msg.append(getFormat(node2, i));
@@ -292,6 +293,7 @@ public class Heap {
             }
             node = node.getLeft();
             node2 = node.getGenerationRight();
+           //System.out.println(node2.getValue());
             msg.append(getFormat(node, i));
             i++;
         }
@@ -379,25 +381,25 @@ public class Heap {
             PathNode currentLevel = getLevel(this.root, level);
             PathNode parentLevel = getLevel(this.root, level-1);
             for (int levelPos = levelSize; levelPos >= 0; levelPos--) { // Cycling through the nodes of a level
-                System.out.println("i = " + level + "  j = " + levelPos);
+              //  System.out.println("i = " + level + "  j = " + levelPos);
                 // Bottom node
                 PathNode b = getLevelNode(currentLevel, levelPos);
                 PathNode bLeft = getLeftNode(currentLevel, b);
                 if (b.getPath() != null) {
-                    System.out.println("b = " + b.getValue() + " b.path = " + b.getPath().toString());
+                  //  System.out.println("b = " + b.getValue() + " b.path = " + b.getPath().toString());
                 } else {
-                    System.out.println("b is NULL");
+                    //System.out.println("b is NULL");
                 }
 
                 if (level == 1) {
-                    System.out.println("\nStopping before root\n");
+                    //System.out.println("\nStopping before root\n");
                     flowDown(b.getParent(), 0);// should flow down the root
                     level = 0;
                 } else {
                     try {
                         // Parent node
                         PathNode a = b.getParent();
-                        System.out.println("a = " + a.getValue() + " a.path = " + a.getPath().toString());
+                    //    System.out.println("a = " + a.getValue() + " a.path = " + a.getPath().toString());
                         PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
                         if (level==0) {
                             this.root = a;
@@ -408,7 +410,7 @@ public class Heap {
                             bubbleUp(a, aLeft, b, bLeft, level);
                         }
                     } catch (NullPointerException e) {
-                        System.out.println("a is NULL");
+                     //   System.out.println("a is NULL");
                     }
                 }
             }
@@ -449,7 +451,7 @@ public class Heap {
      */
     public int findLevelSize(PathNode level) {
         int levelSize = 0;
-        System.out.println("findLevelSize running...");
+      //  System.out.println("findLevelSize running...");
         while (level != null && level.getGenerationRight() != null) {
 //            System.out.println("level.getValue = " + level.getValue() +
 //                    "\n level.getGenerationRight() = ");
@@ -524,7 +526,7 @@ public class Heap {
     }
 
     public void swapNodes(PathNode a, PathNode b, int mode) {
-        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
+       // System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         PathNode c = a.getParent();
         if (c != null) {
             if (c.getLeft() == a) {
@@ -539,6 +541,9 @@ public class Heap {
         // Swapping b.parent = a.parent and a.parent = b
         b.setParent(a.getParent());
         a.setParent(b);
+
+       // System.out.println("root: " + root.getValue());
+        setGenerationLinks(root);
 
         // Swapping a.child -> b
         if (a.getLeft() == b) {
@@ -558,8 +563,7 @@ public class Heap {
             a.setLeft(b.getLeft());
             b.setLeft(tempLeft);
         }
-
-        setGenerationLinks(this.root);
+        print();
         if (mode == 0) {
             if (b.getValue() < b.getParent().getValue()) {
                 a = b.getParent();
@@ -598,6 +602,17 @@ public class Heap {
      */
     private void bubbleUp(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
                           int currentLevel) {
+        PathNode tempGenRight = a.getGenerationRight();
+        a.setGenerationRight(b.getGenerationRight());
+        b.setGenerationRight(tempGenRight);
+
+        // Swapping a's genLeft with b and b's genLeft with a
+        if (aLeft != a) {
+            aLeft.setGenerationRight(b);
+        }
+        if (bLeft != b) {
+            bLeft.setGenerationRight(a);
+        }
 //        System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         swapNodes(a, b, 0);
 //        // Swapping a.parent.child = b
@@ -639,17 +654,7 @@ public class Heap {
         //TODO move this to swapNodes!!!!
 
         // Swapping a.genRight = b.genRight and b.genRight = a.genRight
-        PathNode tempGenRight = a.getGenerationRight();
-        a.setGenerationRight(b.getGenerationRight());
-        b.setGenerationRight(tempGenRight);
 
-        // Swapping a's genLeft with b and b's genLeft with a
-        if (aLeft != a) {
-            aLeft.setGenerationRight(b);
-        }
-        if (bLeft != b) {
-            bLeft.setGenerationRight(a);
-        }
 //
 //        if (b.getValue() < b.getParent().getValue()) {
 //            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
@@ -687,6 +692,22 @@ public class Heap {
         }
     }
 
+    public void print(){
+        PathNode t = root;
+        PathNode t2 = t.getGenerationRight();
+        System.out.println("\n\n\n");
+        while(t != null){
+            System.out.println("Node value is: " + t.getValue());
+            while(t2 != null){
+                System.out.println("Generation link: " + t2.getValue());
+                t2 = t2.getGenerationRight();
+            }
+            t = t.getLeft();
+            System.out.println(t);
+            if(t != null) t2 = t;
+        }
+    }
+
     /**
      * Runs all the functions to read in the input file, build a tree, initialize all fields such
      * as isLevelEnd, Generation links, etc., then performs a min heap and writes a before
@@ -696,7 +717,7 @@ public class Heap {
      */
     public void go(String inputFilename, String outputFilename) {
         readPaths(inputFilename);
-        buildCompleteTree(ZERO);//,ZERO);
+        buildCompleteTree(ZERO);
         this.root = this.tempPath.get(ZERO);
         this.label = outputFilename;
 
@@ -751,10 +772,12 @@ public class Heap {
         // Finds the depth of the tree
         findTreeDepth(this.root);
 //        System.out.println("Sort1\n");
+        print();
+        System.out.println("mmmmmmmmmmmmmmmmmmmmmm");
         minSort();
 //        System.out.println("Sort2\n");
-//        minSort();
 
         printTreeLevels(ONE);
     }
 }
+
