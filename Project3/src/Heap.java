@@ -374,27 +374,37 @@ public class Heap {
      *      b        a
      */
     public void minSort() {
-        for (int i = this.treeDepth-1; i >= 0; i--) { // Cycling through the levels of the tree
-            int levelSize = findLevelSize(getLevel(this.root, i));
-            PathNode currentLevel = getLevel(this.root, i);
-            PathNode parentLevel = getLevel(this.root, i-1);
-            for (int j = levelSize; j >= 0; j--) { // Cycling through the nodes of a level
-                System.out.println("i = " + i + "  j = " + j);
+        for (int level = this.treeDepth-1; level >= 0; level--) { // Cycling through the levels of the tree
+            int levelSize = findLevelSize(getLevel(this.root, level));
+            PathNode currentLevel = getLevel(this.root, level);
+            PathNode parentLevel = getLevel(this.root, level-1);
+            for (int levelPos = levelSize; levelPos >= 0; levelPos--) { // Cycling through the nodes of a level
+                System.out.println("i = " + level + "  j = " + levelPos);
                 // Bottom node
-                PathNode b = getLevelNode(currentLevel, j);
+                PathNode b = getLevelNode(currentLevel, levelPos);
                 PathNode bLeft = getLeftNode(currentLevel, b);
-
-                // Parent node
-                PathNode a = b.getParent();
-                PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
-
-                if (i==0) {
-                    this.root = a;
-//                    break;
+                if (b.getPath() != null) {
+                    System.out.println("b = " + b.getValue() + " b.path = " + b.getPath().toString());
+                } else {
+                    System.out.println("b is NULL");
                 }
 
-                if (b.getValue() < a.getValue()) {
-                        swapNodes(a, aLeft, b, bLeft);
+
+                // Parent node
+                try {
+                    PathNode a = b.getParent();
+                    System.out.println("a = " + a.getValue() + " a.path = " + a.getPath().toString());
+                    PathNode aLeft = getLeftNode(parentLevel, a); // Causes null PointerException
+                    if (level==0) {
+                        this.root = a;
+//                        break;
+                    }
+
+                    if (b.getValue() < a.getValue()) {
+                        swapNodes(a, aLeft, b, bLeft, level);
+                    }
+                } catch (NullPointerException e) {
+                    System.out.println("a is NULL");
                 }
             }
         }
@@ -494,7 +504,9 @@ public class Heap {
      * @param b Current node to be swapped
      * @param bLeft The node to the left of the current node
      */
-    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft) {
+    // TODO make recursive
+    private void swapNodes(PathNode a, PathNode aLeft, PathNode b, PathNode bLeft,
+                           int currentLevel) {
         System.out.println("swapping nodes: a = " + a.getValue() + " and b = " + b.getValue());
         // Swapping a.parent.child = b
         PathNode c = a.getParent();
@@ -541,6 +553,27 @@ public class Heap {
         if (bLeft != b) {
             bLeft.setGenerationRight(a);
         }
+
+        if (b.getValue() < b.getParent().getValue()) {
+            System.out.println("\nRECURSIVE CALLING SWAPNODES\n");
+            bLeft = getLeftNode(getLevelNode(this.root,currentLevel-1), b);//fix value
+            a = b.getParent();
+            aLeft = getLeftNode(getLevelNode(this.root,currentLevel-2), a);//fix value
+            swapNodes(a, aLeft, b, bLeft, currentLevel-1);
+        } else {
+            resetRoot(b);
+        }
+    }
+
+    /**
+     * Resets the root to keep it updated with all new swaps
+     * @param currentNode Node to move up to the root from
+     */
+    public void resetRoot(PathNode currentNode) {
+        while (currentNode.getParent() != null) {
+            currentNode = currentNode.getParent();
+        }
+        this.root = currentNode;
     }
 
     /**
@@ -620,6 +653,9 @@ public class Heap {
         //Make sure data is correct (isLevelEnd, lastNode, genLinks, etc.)
         // Finds the depth of the tree
         findTreeDepth(this.root);
+        System.out.println("Sort1\n");
+        minSort();
+        System.out.println("Sort2\n");
         minSort();
 
         printTreeLevels(ONE);
