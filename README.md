@@ -33,5 +33,9 @@ Todo this, install graphViz and run the commands:
 ## Known bugs
 
 ---
-There are no known bugs at this time, however when minSorting a graph the root node may not flow 
-all the way down to it's correct position.
+The only known bug is that the program will sort trees up to 9 total nodes.
+
+After 9 nodes bugs start to pop up, some of these bugs are:
+* Nodes maybe removed
+* Nodes maybe moved to the generational right cousin of the root
+* Nodes maybe shifted to the left
