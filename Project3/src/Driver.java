@@ -45,8 +45,8 @@ public class Driver {
             Heap heap = new Heap();
             heap.go(args[0], args[1]);
         } catch(Exception e){
-//            System.out.println("An Error has occurred please try again");
-//            System.out.println("Usage: java Driver file.txt <label>");
+            System.out.println("An Error has occurred please try again");
+            System.out.println("Usage: java Driver file.txt <label>");
             e.printStackTrace();
             System.exit(1);
         }
